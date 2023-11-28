@@ -6,8 +6,8 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   5: {
-    SimpleDCA: {
-      address: "0x7FFa5471C226076c1312D356aF7cce00C83Ab38C",
+    FlexDCA: {
+      address: "0x7B0e3f790Cee82FdD35690e9f918f33061e3fa8C",
       abi: [
         {
           inputs: [
@@ -89,19 +89,6 @@ const deployedContracts = {
           ],
           name: "SafeERC20FailedOperation",
           type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: false,
-              internalType: "string",
-              name: "func",
-              type: "string",
-            },
-          ],
-          name: "Log",
-          type: "event",
         },
         {
           anonymous: false,
@@ -223,6 +210,57 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "getAllUserStrategies",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "amountLeft",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "amountOnce",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "claimAvailable",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "nextExecute",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "executeRepeat",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "active",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct FlexDCA.UserStrategyDetails[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "uint32",
               name: "_strategyId",
               type: "uint32",
@@ -245,6 +283,11 @@ const deployedContracts = {
         },
         {
           inputs: [
+            {
+              internalType: "string",
+              name: "_title",
+              type: "string",
+            },
             {
               internalType: "address",
               name: "_fromAsset",
@@ -314,6 +357,11 @@ const deployedContracts = {
           ],
           name: "strategies",
           outputs: [
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
             {
               internalType: "address",
               name: "fromAsset",

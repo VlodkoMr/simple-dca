@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
@@ -120,6 +121,14 @@ const config: HardhatUserConfig = {
     },
     scroll: {
       url: "https://rpc.scroll.io",
+      accounts: [deployerPrivateKey],
+    },
+    avalancheFuji: {
+      url: "https://avalanche-fuji-c-chain.publicnode.com",
+      accounts: [deployerPrivateKey],
+    },
+    avalanche: {
+      url: "https://rpc.ankr.com/avalanche",
       accounts: [deployerPrivateKey],
     },
   },

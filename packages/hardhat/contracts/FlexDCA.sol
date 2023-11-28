@@ -24,6 +24,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     mapping(address => uint32[]) public userStrategies;
 
     struct Strategy {
+        string title;
         address fromAsset;
         address toAsset;
         bytes32 balancerPoolId;
@@ -156,11 +157,11 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     public view
     returns (UserStrategyDetails[] memory)
     {
-        uint32 _strategyCount = userStrategies[_user].length;
+        uint32 _strategyCount = uint32(userStrategies[_user].length);
         UserStrategyDetails[] memory _result = new UserStrategyDetails[](_strategyCount);
         for (uint32 _i = 0; _i < _strategyCount; _i++) {
             uint32 _strategyId = userStrategies[_user][_i];
-            _result.push(userStrategyDetails[_user][_strategyId]);
+            _result[_i] = userStrategyDetails[_user][_strategyId];
         }
 
         return _result;
@@ -328,17 +329,20 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     // ---------------------- OnlyOwner ----------------------
 
     function newStrategy(
+        string memory _title,
         address _fromAsset,
         address _toAsset,
         bytes32 _balancerPoolId,
         uint32 _usersLimit
     ) public onlyOwner {
+        require(bytes(_title).length > 0, "DCA#11: title is required");
         require(_fromAsset != address(0), "DCA#08: fromAsset is zero address");
         require(_balancerPoolId != bytes32(0), "DCA#09: balancerPoolId is zero");
         require(_usersLimit > 0, "DCA#10: usersLimit must be greater than 0");
 
         totalStrategies++;
         strategies[totalStrategies] = Strategy({
+            title: _title,
             fromAsset: _fromAsset,
             toAsset: _toAsset,
             balancerPoolId: _balancerPoolId,
