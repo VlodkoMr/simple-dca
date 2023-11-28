@@ -106,6 +106,8 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
   }
 };
 
+export default dataSeed;
+
 // Tags are useful if you have multiple deploy files and only want to run one of them.
 // e.g. yarn deploy --tags generateTsAbis
 dataSeed.tags = ["dataSeed"];
