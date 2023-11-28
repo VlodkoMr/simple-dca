@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     SimpleDCA: {
-      address: "0x9C8cE0b4d1C7a0CD0e27ACe1CaE584c9DC5bb52c",
+      address: "0x7FFa5471C226076c1312D356aF7cce00C83Ab38C",
       abi: [
         {
           inputs: [
@@ -94,6 +94,19 @@ const deployedContracts = {
           anonymous: false,
           inputs: [
             {
+              indexed: false,
+              internalType: "string",
+              name: "func",
+              type: "string",
+            },
+          ],
+          name: "Log",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
               indexed: true,
               internalType: "address",
               name: "previousOwner",
@@ -110,27 +123,8 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "_strategyId",
-              type: "uint32",
-            },
-            {
-              internalType: "uint256",
-              name: "_executeRepeat",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountOnce",
-              type: "uint256",
-            },
-          ],
-          name: "activate",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
+          stateMutability: "payable",
+          type: "fallback",
         },
         {
           inputs: [],
@@ -177,7 +171,7 @@ const deployedContracts = {
               type: "uint32",
             },
           ],
-          name: "deactivate",
+          name: "claimTokens",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -201,6 +195,19 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+          ],
+          name: "exitStrategy",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
           inputs: [],
           name: "feeCollector",
           outputs: [
@@ -211,6 +218,29 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+            {
+              internalType: "uint256",
+              name: "_executeRepeat",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_amountOnce",
+              type: "uint256",
+            },
+          ],
+          name: "joinEditStrategy",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -311,11 +341,6 @@ const deployedContracts = {
             },
             {
               internalType: "uint32",
-              name: "usersCount",
-              type: "uint32",
-            },
-            {
-              internalType: "uint32",
               name: "usersLimit",
               type: "uint32",
             },
@@ -345,6 +370,40 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_fromAsset",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_toAsset",
+              type: "address",
+            },
+            {
+              internalType: "bytes32",
+              name: "_balancerPoolId",
+              type: "bytes32",
+            },
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+          ],
+          name: "swap",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -424,6 +483,11 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
+              name: "claimAvailable",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
               name: "nextExecute",
               type: "uint256",
             },
@@ -440,6 +504,10 @@ const deployedContracts = {
           ],
           stateMutability: "view",
           type: "function",
+        },
+        {
+          stateMutability: "payable",
+          type: "receive",
         },
       ],
       inheritedFunctions: {

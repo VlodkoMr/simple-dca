@@ -1,6 +1,6 @@
-# Simple DCA
+# Flex DCA
 
-Welcome to SimpleDCA, where seamless crypto swaps meet the well-known Dollar Cost Averaging (DCA) strategy.
+Welcome to FlexDCA, where seamless crypto swaps meet the well-known Dollar Cost Averaging (DCA) strategy.
 Diversify and enhance your portfolio effortlessly with our user-friendly platform.
 Simplify crypto investing with precision and strategy, using the tried-and-true DCA approach for optimal results.
 
@@ -53,6 +53,7 @@ yarn start
 
 ``` 
 yarn deploy --network goerli --reset
+yarn verify --network goerli
 ```
 
 ### Deploy on Sepolia & Polygon Mumbai:
