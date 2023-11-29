@@ -42,15 +42,24 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
-        <img
+
+        <Image
           className="banner-shape absolute -top-28 right-0 -z-[1] w-full max-w-[30%]"
           src="/images/banner-shape.svg"
+          width="603"
+          height="396"
           alt=""
         />
       </section>
 
       <section className="section key-feature relative">
-        <img className="absolute left-0 top-0 -z-[1] -translate-y-1/2" src="/images/icons/feature-shape.svg" alt="" />
+        <Image
+          className="absolute left-0 top-0 -z-[1] -translate-y-1/2"
+          src="/images/icons/feature-shape.svg"
+          alt=""
+          width={60}
+          height={60}
+        />
         <div className="container">
           <div className="row justify-between text-center lg:text-start">
             <div className="lg:col-5">

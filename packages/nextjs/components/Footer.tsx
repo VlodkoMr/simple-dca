@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -11,7 +12,7 @@ export const Footer = () => {
         <div className="row gx-5 pb-10 pt-[20px]">
           <div className="col-12 mt-10 mb-6 md:col-6 lg:col-3">
             <Link href="/">
-              <img src="/logo.png" alt="" width={180} />
+              <Image src={"/logo.png"} width={150} height={30} alt="" />
             </Link>
             <p className="mt-4">
               Empower your financial journey with FlexDCA. Your path to smart investing starts here.
@@ -46,7 +47,7 @@ export const Footer = () => {
           </div>
           <div className="col-12 mt-12 md:col-6 lg:col-3">
             <h6>Socials</h6>
-            <ul className="social-icons mt-4 lg:mt-6">
+            <ul className="social-icons">
               <li>
                 <Link href="#">
                   <svg width="19" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
