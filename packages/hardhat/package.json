@@ -11,6 +11,7 @@
     "lint": "eslint --config ./.eslintrc.json --ignore-path ./.eslintignore ./*.ts ./deploy/**/*.ts ./scripts/**/*.ts ./test/**/*.ts",
     "lint-staged": "eslint --config ./.eslintrc.json --ignore-path ./.eslintignore",
     "test": "REPORT_GAS=true hardhat test --network hardhat",
+    "contract:size": "npx hardhat size-contracts",
     "verify": "hardhat etherscan-verify"
   },
   "devDependencies": {
@@ -50,6 +51,7 @@
     "@openzeppelin/contracts": "^5.0.0",
     "dotenv": "^16.0.3",
     "envfile": "^6.18.0",
+    "hardhat-contract-sizer": "^2.10.0",
     "qrcode": "^1.5.1"
   }
 }

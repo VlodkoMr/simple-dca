@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     FlexDCA: {
-      address: "0x7B0e3f790Cee82FdD35690e9f918f33061e3fa8C",
+      address: "0x522c20cB0dCF84E1D332EF91aa7c68A17caCF55e",
       abi: [
         {
           inputs: [
@@ -202,6 +202,56 @@ const deployedContracts = {
               internalType: "address",
               name: "",
               type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllStrategies",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "fromAsset",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "toAsset",
+                  type: "address",
+                },
+                {
+                  internalType: "bytes32",
+                  name: "balancerPoolId",
+                  type: "bytes32",
+                },
+                {
+                  internalType: "uint256",
+                  name: "totalAmountFromAsset",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "totalAmountToAsset",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint32",
+                  name: "usersLimit",
+                  type: "uint32",
+                },
+              ],
+              internalType: "struct FlexDCA.Strategy[]",
+              name: "",
+              type: "tuple[]",
             },
           ],
           stateMutability: "view",

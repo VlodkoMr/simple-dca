@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import "hardhat-contract-sizer";
 
 dotenv.config();
 import { HardhatUserConfig } from "hardhat/config";

@@ -167,6 +167,18 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         return _result;
     }
 
+    function getAllStrategies()
+    public view
+    returns (Strategy[] memory)
+    {
+        Strategy[] memory _result = new Strategy[](totalStrategies);
+        for (uint32 _i = 0; _i < totalStrategies; _i++) {
+            _result[_i] = strategies[_i + 1];
+        }
+
+        return _result;
+    }
+
     function checkUpkeep(bytes calldata checkData)
     external view
     override
