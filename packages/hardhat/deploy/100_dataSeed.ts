@@ -20,7 +20,7 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
   const flexDCAContract = await hre.ethers.getContract("FlexDCA", owner);
 
   const pools: Record<string, any> = {
-    goerly: [
+    goerli: [
       {
         title: "USDC/ETH",
         from: "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
@@ -95,10 +95,11 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
   };
 
   console.log(`network`, network);
+  const usersInStrategy = 1000;
 
   if (pools[network.name]) {
     for (const pool of pools[network.name]) {
-      await flexDCAContract.newStrategy(pool.title, pool.from, pool.to, pool.pool, 500);
+      await flexDCAContract.newStrategy(pool.title, pool.from, pool.to, pool.pool, usersInStrategy);
       console.log(`${pool.title} strategy added`);
     }
   } else {
