@@ -12,6 +12,8 @@ const Strategies: NextPage = () => {
   const {address} = useAccount();
   const [onlyMyStrategies, setOnlyMyStrategies] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [joinStrategy, setJoinStrategy] = useState();
+  // const [joinStrategyFromToken, setJoinStrategyFromToken] = useState("");
 
   const {data: allStrategies} = useScaffoldContractRead({
     contractName: "FlexDCA",
@@ -57,7 +59,7 @@ const Strategies: NextPage = () => {
           <div>
             <input type="text"
                    placeholder="Search"
-                   className="input w-full max-w-xs border-gray-300 text-sm rounded-full"
+                   className="input w-full max-w-xs border-gray-300 text-sm rounded-full focus:outline-none focus:border-orange-400 transition"
             />
           </div>
         </div>
@@ -95,9 +97,10 @@ const Strategies: NextPage = () => {
                 </div>
                 <div className={"w-32 text-right leading-3"}>
 
-                  <button className={"btn btn-sm border-white hover:bg-orange-300 hover:border-orange-400"} onClick={(e) => {
+                  <button className={"btn btn-sm border-white rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"} onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
+                    setJoinStrategy(strategy);
                     document.getElementById('join_strategy_modal')?.showModal();
                   }}>Join
                   </button>
@@ -117,10 +120,9 @@ const Strategies: NextPage = () => {
             </Link>
           ))}
         </div>
-
       </div>
 
-      <JoinStrategy id={1} />
+      <JoinStrategy strategy={joinStrategy} />
     </>
   );
 };
