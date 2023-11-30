@@ -14,9 +14,9 @@ type MetaHeaderProps = {
 const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/` : "/";
 
 export const MetaHeader = ({
-  title = "Scaffold-ETH 2 App",
-  description = "Built with 🏗 Scaffold-ETH 2",
-  image = "thumbnail.jpg",
+  title = "FlexDCA - Decentralized Capital Allocation",
+  description = "FlexDCA is a decentralized capital allocation protocol that allows anyone to create and manage a portfolio of assets and use DCA strategy for investment.",
+  image = "",
   twitterCard = "summary_large_image",
   children,
 }: MetaHeaderProps) => {

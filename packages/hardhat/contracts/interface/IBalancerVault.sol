@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-    enum SwapKind { GIVEN_IN, GIVEN_OUT }
+    enum SwapKind {GIVEN_IN, GIVEN_OUT}
 
     struct SingleSwap {
         bytes32 poolId;
@@ -19,7 +19,7 @@ pragma solidity 0.8.23;
         bool toInternalBalance;
     }
 
-interface IVault {
+interface IBalancerVault {
     function swap(
         SingleSwap memory singleSwap,
         FundManagement memory funds,

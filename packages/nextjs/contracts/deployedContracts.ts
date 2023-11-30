@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     FlexDCA: {
-      address: "0x007EF72c5ED8Dfc58428EA732c275477C0c0EBcA",
+      address: "0x7d07982b93A2A859F38432daD85bdf031Da3A79b",
       abi: [
         {
           inputs: [
@@ -19,6 +19,11 @@ const deployedContracts = {
             {
               internalType: "address",
               name: "_balancerVault",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_uniswapSwapRouter",
               type: "address",
             },
             {
@@ -110,23 +115,6 @@ const deployedContracts = {
           type: "event",
         },
         {
-          stateMutability: "payable",
-          type: "fallback",
-        },
-        {
-          inputs: [],
-          name: "balancerVault",
-          outputs: [
-            {
-              internalType: "contract IVault",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "bytes",
@@ -214,8 +202,28 @@ const deployedContracts = {
             {
               components: [
                 {
+                  internalType: "uint32",
+                  name: "id",
+                  type: "uint32",
+                },
+                {
+                  internalType: "uint32",
+                  name: "usersLimit",
+                  type: "uint32",
+                },
+                {
                   internalType: "string",
                   name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "assetFromTitle",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "assetToTitle",
                   type: "string",
                 },
                 {
@@ -235,6 +243,11 @@ const deployedContracts = {
                 },
                 {
                   internalType: "uint256",
+                  name: "totalBalance",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
                   name: "totalAmountFromAsset",
                   type: "uint256",
                 },
@@ -244,9 +257,9 @@ const deployedContracts = {
                   type: "uint256",
                 },
                 {
-                  internalType: "uint32",
-                  name: "usersLimit",
-                  type: "uint32",
+                  internalType: "bool",
+                  name: "active",
+                  type: "bool",
                 },
               ],
               internalType: "struct FlexDCA.Strategy[]",
@@ -339,6 +352,16 @@ const deployedContracts = {
               type: "string",
             },
             {
+              internalType: "string",
+              name: "_assetFromTitle",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_assetToTitle",
+              type: "string",
+            },
+            {
               internalType: "address",
               name: "_fromAsset",
               type: "address",
@@ -408,8 +431,28 @@ const deployedContracts = {
           name: "strategies",
           outputs: [
             {
+              internalType: "uint32",
+              name: "id",
+              type: "uint32",
+            },
+            {
+              internalType: "uint32",
+              name: "usersLimit",
+              type: "uint32",
+            },
+            {
               internalType: "string",
               name: "title",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "assetFromTitle",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "assetToTitle",
               type: "string",
             },
             {
@@ -429,6 +472,11 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
+              name: "totalBalance",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
               name: "totalAmountFromAsset",
               type: "uint256",
             },
@@ -438,9 +486,9 @@ const deployedContracts = {
               type: "uint256",
             },
             {
-              internalType: "uint32",
-              name: "usersLimit",
-              type: "uint32",
+              internalType: "bool",
+              name: "active",
+              type: "bool",
             },
           ],
           stateMutability: "view",
@@ -471,40 +519,6 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_toAsset",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "_balancerPoolId",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "swap",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "totalStrategies",
           outputs: [
@@ -526,6 +540,53 @@ const deployedContracts = {
             },
           ],
           name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_fromAsset",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_toAsset",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+          ],
+          name: "uniswapSwap",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+            {
+              internalType: "bytes32",
+              name: "_balancerPoolId",
+              type: "bytes32",
+            },
+          ],
+          name: "updateStrategyPoolId",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -603,14 +664,12 @@ const deployedContracts = {
           stateMutability: "view",
           type: "function",
         },
-        {
-          stateMutability: "payable",
-          type: "receive",
-        },
       ],
       inheritedFunctions: {
-        checkUpkeep: "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
-        performUpkeep: "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
+        checkUpkeep:
+          "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
+        performUpkeep:
+          "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
         owner: "@openzeppelin/contracts/access/Ownable.sol",
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
