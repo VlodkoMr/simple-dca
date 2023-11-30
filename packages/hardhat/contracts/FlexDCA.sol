@@ -41,6 +41,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     }
 
     struct UserStrategyDetails {
+        uint32 strategyId;
         uint256 amountLeft;
         uint256 amountOnce;
         uint256 claimAvailable;
@@ -50,7 +51,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     }
 
     modifier userStrategyExists(uint32 _strategyId) {
-        if (userStrategyDetails[msg.sender][_strategyId].nextExecute == 0) {
+        if (userStrategyDetails[msg.sender][_strategyId].strategyId == 0) {
             revert("DCA#01: user strategy does not exist");
         }
         _;
@@ -82,10 +83,11 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     public
     strategyExists(_strategyId)
     {
-        if (userStrategyDetails[msg.sender][_strategyId].nextExecute == 0) {
+        if (userStrategyDetails[msg.sender][_strategyId].strategyId == 0) {
             require(strategyUsers[_strategyId].length < strategies[_strategyId].usersLimit, "DCA#03: Strategy users limit reached");
 
             userStrategyDetails[msg.sender][_strategyId] = UserStrategyDetails({
+                strategyId: _strategyId,
                 amountLeft: 0,
                 amountOnce: _amountOnce,
                 nextExecute: block.timestamp + _executeRepeat,

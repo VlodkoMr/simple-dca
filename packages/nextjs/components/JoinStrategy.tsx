@@ -1,5 +1,9 @@
-import React, {useEffect, useState} from "react";
-import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import React, {useEffect, useMemo, useState} from "react";
+import {useDeployedContractInfo, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import {BigNumber} from "@ethersproject/bignumber";
+import {erc20ABI, useAccount, useContractRead, useToken} from "wagmi";
+import {formatUnits, parseUnits} from "viem";
+import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -8,24 +12,49 @@ type MetaHeaderProps = {
 export const JoinStrategy = ({
   strategy,
 }: MetaHeaderProps) => {
+  const account = useAccount();
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState(0);
+  const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
   const [splitCount, setSplitCount] = useState(10);
   const [repeat, setRepeat] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
-  const amountOnce = () => {
-    if (totalDeposit && splitCount) {
-      return (totalDeposit / splitCount).toFixed(2);
+
+  const {data: fromToken} = useToken({
+    address: strategy?.fromAsset,
+    enabled: !!strategy?.fromAsset,
+  });
+
+  const {data: flexDCAContract} = useDeployedContractInfo("FlexDCA");
+
+  const {data: tokenAllowance} = useContractRead({
+    address: strategy?.fromAsset,
+    abi: erc20ABI,
+    functionName: "allowance",
+    args: [account?.address as string, flexDCAContract?.address as string],
+    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address,
+  });
+
+  const amountOnce = useMemo(() => {
+    if (totalDepositWei && splitCount) {
+      return BigNumber.from(totalDepositWei).div(splitCount).toString();
     }
     return 0;
-  };
+  }, [totalDepositWei, splitCount]);
+
+  useEffect(() => {
+    const decimals = fromToken?.decimals || 0;
+    setTotalDepositWei(parseUnits(totalDeposit.toString(), decimals));
+  }, [totalDeposit]);
+
 
   useEffect(() => {
     if (strategy) {
       setCurrentStep(1);
       setTotalDeposit(0);
+      setTotalDepositWei(BigInt(0));
       setSplitCount(10);
       setRepeat(0);
       setIsLoading(false);
@@ -35,30 +64,79 @@ export const JoinStrategy = ({
   const {writeAsync: joinStrategyWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
-    args: [strategy?.id, repeat, amountOnce],
-    enabled: strategy && amountOnce,
+    args: [strategy?.id, BigNumber.from(repeat).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    enabled: !!strategy && !!amountOnce && repeat > 0,
     onError: (error) => {
       alert(error);
       setIsLoading(false);
     },
+    onBlockConfirmation: (txnReceipt) => {
+      console.log(`joinStrategyWrite txnReceipt`, txnReceipt);
+      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+    },
     onSuccess: (tx) => {
       if (tx) {
-        alert("Transaction sent: " + tx.hash);
+        console.log("Transaction sent: " + tx.hash);
       }
-
-      setIsLoading(false);
     }
   });
 
+  const {writeAsync: writeApprove} = useScaffoldAddressWrite({
+    address: strategy?.fromAsset,
+    functionName: "approve",
+    abi: erc20ABI,
+    args: [flexDCAContract?.address, Number(totalDepositWei)],
+    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei,
+    onBlockConfirmation: (txnReceipt) => {
+      console.log(`writeApprove txnReceipt`, txnReceipt);
+      setCurrentStep(3);
+      depositWrite();
+      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+    },
+    onError: (error) => {
+      alert(error);
+      setIsLoading(false);
+    },
+  });
 
-  const joinStrategy = () => {
+  const {writeAsync: depositWrite} = useScaffoldContractWrite({
+    contractName: "FlexDCA",
+    functionName: "deposit",
+    args: [totalDepositWei, strategy?.id],
+    enabled: !!strategy && !!totalDepositWei,
+    onError: (error) => {
+      alert(error);
+      setIsLoading(false);
+    },
+    onBlockConfirmation: (txnReceipt) => {
+      console.log(`depositWrite txnReceipt`, txnReceipt);
+      setIsLoading(false);
+      document.getElementById('join_strategy_modal')?.close();
+      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+    },
+    onSuccess: (tx) => {
+      if (tx) {
+        console.log("Transaction sent: " + tx.hash);
+      }
+    }
+  });
+
+  const joinStrategy = async () => {
     if (!splitCount || !repeat || !totalDeposit) {
       alert("Please enter an amount and repeat period");
       return;
     }
 
     setIsLoading(true);
-    joinStrategyWrite();
+    joinStrategyWrite().then(() => {
+      if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
+        setCurrentStep(2);
+        writeApprove();
+      } else {
+        setCurrentStep(3);
+        depositWrite();
+      }
+    });
   }
 
   return (
@@ -92,6 +170,7 @@ export const JoinStrategy = ({
                   onChange={(e) => {
                     setRepeat(parseInt(e.target.value));
                   }}
+                  defaultValue={repeat}
                   className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
                   <option disabled selected>Choose schedule period</option>
                   <option value={12}>Twice a day</option>
@@ -110,13 +189,14 @@ export const JoinStrategy = ({
               <div className={"flex flex-row gap-4 mb-3"}>
                 <div className={"w-32 pt-3 text-right"}>Split to:</div>
                 <select
+                  defaultValue={splitCount}
                   onChange={(e) => {
                     setSplitCount(parseInt(e.target.value));
                   }}
                   className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
                   <option disabled selected>Choose transactions count</option>
                   {splitOptions.map((option) => (
-                    <option value={option}>{option}</option>
+                    <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
               </div>
@@ -124,13 +204,11 @@ export const JoinStrategy = ({
               <div className={"flex flex-row gap-4 mb-3"}>
                 <div className={"w-32 text-right"}>Pay once:</div>
                 <div>
-                  <span>
-                    {totalDeposit > 0 && splitCount > 0 ? (
-                      <>
-                        {amountOnce()} {strategy.assetFromTitle}
-                      </>
-                    ) : ("-")}
-                  </span>
+                  {totalDeposit > 0 && splitCount > 0 ? (
+                    <>
+                      {formatUnits(amountOnce, fromToken?.decimals || 0)} {strategy.assetFromTitle}
+                    </>
+                  ) : ("-")}
                 </div>
               </div>
 
@@ -148,9 +226,13 @@ export const JoinStrategy = ({
           ) : (
 
             <div className={"text-center"}>
+              <div className={"my-6"}>
+                <span className="loading loading-spinner loading-lg opacity-50"></span>
+              </div>
+
               <ul className="steps gap-4">
-                <li className={`step ${currentStep === 1 && "step-primary"}`}>Join Strategy</li>
-                <li className={`step ${currentStep === 2 && "step-primary"}`}>Approve {strategy.assetFromTitle}</li>
+                <li className={`step ${currentStep >= 1 && "step-primary"}`}>Join Strategy</li>
+                <li className={`step ${currentStep >= 2 && "step-primary"}`}>Approve {strategy.assetFromTitle}</li>
                 <li className={`step ${currentStep === 3 && "step-primary"}`}>Deposit {strategy.assetFromTitle}</li>
               </ul>
             </div>
