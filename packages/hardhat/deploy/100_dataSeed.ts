@@ -46,6 +46,32 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
         pool: "0x19cbce9003155892f9fdd518ff7762c51be6b8e3000200000000000000000766",
       },
     ],
+    polygon: [
+      {
+        title: "USDC/",
+        from: "",
+        to: "",
+        pool: "",
+      },
+      {
+        title: "USDC/",
+        from: "",
+        to: "",
+        pool: "",
+      },
+      {
+        title: "USDC/",
+        from: "",
+        to: "",
+        pool: "",
+      },
+      {
+        title: "USDT/",
+        from: "",
+        to: "",
+        pool: "",
+      },
+    ],
     polygonZkEvm: [
       {
         title: "USDC/ETH",

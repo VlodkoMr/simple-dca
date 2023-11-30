@@ -5,6 +5,7 @@ import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { BottomBanner } from "~~/components/BottomBanner";
 
 const Home: NextPage = () => {
   const { address } = useAccount();
@@ -265,113 +266,153 @@ const Home: NextPage = () => {
         </div>
       </section>
 
-      <section className="reviews">
-        <div className="container">
-          <div className="row justify-between">
-            <div className="lg:col-6">
-              <h2>Our customers have nice things to say about us</h2>
-            </div>
-            <div className="lg:col-4">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi egestas Werat viverra id et aliquet.
-                vulputate egestas sollicitudin .
+      <section className="faqs section">
+        <div className="container max-w-[1230px]">
+          <div className="row">
+            <div className="text-center lg:col-4 lg:text-start">
+              <h2>Frequently Asked Questions</h2>
+              <p className="mt-6 lg:max-w-[404px]">
+                Vestibulum ante ipsum primis in faucibus orci luctus ultrices posuere
+                cubilia Curae Donec
               </p>
             </div>
-          </div>
-          <div className="row mt-10">
-            <div className="col-12">
-              <div className="swiper reviews-carousel">
-                <div className="swiper-wrapper">
-                  <div className="swiper-slide">
-                    <div className="review">
-                      <div className="review-author-avatar bg-gradient">
-                        <img src="/images/users/user-5.png" alt="" />
-                      </div>
-                      <h4 className="mb-2">Courtney Henry</h4>
-                      <p className="mb-4 text-[#666]">microsoft corp</p>
-                      <p>
-                        Our platform helps build secure onboarding authentica experiences & engage your users. We build
-                        .
-                      </p>
-                      <div className="review-rating mt-6 flex items-center justify-center space-x-2.5">
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star-white.svg" alt="" />
-                      </div>
-                    </div>
+            <div className="mt-8 lg:col-8 lg:mt-0">
+              <div className="rounded-xl bg-white px-5 py-5 shadow-lg lg:px-10 lg:py-8">
+                <div className="accordion active border-b border-border">
+                  <div
+                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
+                    data-accordion
+                  >
+                    How can I integrate Avocode to my current tool stack?
+                    <svg
+                      className="accordion-icon absolute left-0 top-[22px]"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 512 512"
+                      xmlSpace="preserve"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M505.755,123.592c-8.341-8.341-21.824-8.341-30.165,0L256.005,343.176L36.421,123.592c-8.341-8.341-21.824-8.341-30.165,0 s-8.341,21.824,0,30.165l234.667,234.667c4.16,4.16,9.621,6.251,15.083,6.251c5.462,0,10.923-2.091,15.083-6.251l234.667-234.667 C514.096,145.416,514.096,131.933,505.755,123.592z"
+                      ></path>
+                    </svg>
                   </div>
-                  <div className="swiper-slide">
-                    <div className="review">
-                      <div className="review-author-avatar bg-gradient">
-                        <img src="/images/users/user-2.png" alt="" />
-                      </div>
-                      <h4 className="mb-2">Ronald Richards</h4>
-                      <p className="mb-4 text-[#666]">meta limited</p>
-                      <p>
-                        Our platform helps build secure onboarding authentica experiences & engage your users. We build
-                        .
-                      </p>
-                      <div className="review-rating mt-6 flex items-center justify-center space-x-2.5">
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star-white.svg" alt="" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="swiper-slide">
-                    <div className="review">
-                      <div className="review-author-avatar bg-gradient">
-                        <img src="/images/users/user-6.png" alt="" />
-                      </div>
-                      <h4 className="mb-2">Bessie Cooper</h4>
-                      <p className="mb-4 text-[#666]">apple inc ltd</p>
-                      <p>
-                        Our platform helps build secure onboarding authentica experiences & engage your users. We build
-                        .
-                      </p>
-                      <div className="review-rating mt-6 flex items-center justify-center space-x-2.5">
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star.svg" alt="" />
-                        <img src="/images/icons/star-white.svg" alt="" />
-                      </div>
-                    </div>
+                  <div className="accordion-content pl-6">
+                    <p>
+                      The Service is provided for free during this pilot project, and
+                      is provided "as is" with is not committed to any level of
+                      service or availability of the Service.
+                    </p>
+                    <p>
+                      If you enter into this agreement on behalf of a company, you
+                      hereby agree that the company is responsible under this
+                      Agreement for all actions and
+                    </p>
                   </div>
                 </div>
-                <div className="swiper-pagination reviews-carousel-pagination !bottom-0"></div>
+                <div className="accordion border-b border-border">
+                  <div
+                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
+                    data-accordion
+                  >
+                    How can I use Avocode with cloud documents?
+                    <svg
+                      className="accordion-icon absolute left-0 top-[22px]"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 512 512"
+                      xmlSpace="preserve"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M505.755,123.592c-8.341-8.341-21.824-8.341-30.165,0L256.005,343.176L36.421,123.592c-8.341-8.341-21.824-8.341-30.165,0 s-8.341,21.824,0,30.165l234.667,234.667c4.16,4.16,9.621,6.251,15.083,6.251c5.462,0,10.923-2.091,15.083-6.251l234.667-234.667 C514.096,145.416,514.096,131.933,505.755,123.592z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div className="accordion-content pl-6">
+                    <p>
+                      The Service is provided for free during this pilot project, and
+                      is provided "as is" with is not committed to any level of
+                      service or availability of the Service.
+                    </p>
+                    <p>
+                      If you enter into this agreement on behalf of a company, you
+                      hereby agree that the company is responsible under this
+                      Agreement for all actions and
+                    </p>
+                  </div>
+                </div>
+                <div className="accordion border-b border-border">
+                  <div
+                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
+                    data-accordion
+                  >
+                    If I cancel, can I archive my designs to keep them safe come back?
+                    <svg
+                      className="accordion-icon absolute left-0 top-[22px]"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 512 512"
+                      xmlSpace="preserve"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M505.755,123.592c-8.341-8.341-21.824-8.341-30.165,0L256.005,343.176L36.421,123.592c-8.341-8.341-21.824-8.341-30.165,0 s-8.341,21.824,0,30.165l234.667,234.667c4.16,4.16,9.621,6.251,15.083,6.251c5.462,0,10.923-2.091,15.083-6.251l234.667-234.667 C514.096,145.416,514.096,131.933,505.755,123.592z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div className="accordion-content pl-6">
+                    <p>
+                      The Service is provided for free during this pilot project, and
+                      is provided "as is" with is not committed to any level of
+                      service or availability of the Service.
+                    </p>
+                    <p>
+                      If you enter into this agreement on behalf of a company, you
+                      hereby agree that the company is responsible under this
+                      Agreement for all actions and
+                    </p>
+                  </div>
+                </div>
+                <div className="accordion">
+                  <div
+                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
+                    data-accordion
+                  >
+                    How can I adjust user permissions & admin provileges?
+                    <svg
+                      className="accordion-icon absolute left-0 top-[22px]"
+                      x="0px"
+                      y="0px"
+                      viewBox="0 0 512 512"
+                      xmlSpace="preserve"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M505.755,123.592c-8.341-8.341-21.824-8.341-30.165,0L256.005,343.176L36.421,123.592c-8.341-8.341-21.824-8.341-30.165,0 s-8.341,21.824,0,30.165l234.667,234.667c4.16,4.16,9.621,6.251,15.083,6.251c5.462,0,10.923-2.091,15.083-6.251l234.667-234.667 C514.096,145.416,514.096,131.933,505.755,123.592z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div className="accordion-content pl-6">
+                    <p>
+                      The Service is provided for free during this pilot project, and
+                      is provided "as is" with is not committed to any level of
+                      service or availability of the Service.
+                    </p>
+                    <p>
+                      If you enter into this agreement on behalf of a company, you
+                      hereby agree that the company is responsible under this
+                      Agreement for all actions and
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-5 xl:pt-[20px] xl:pb-[80px]">
-        <div className="container">
-          <div className="bg-gradient row justify-center rounded-b-[80px] rounded-t-[20px] px-[30px] pb-[75px] pt-16">
-            <div className="lg:col-11">
-              <div className="row">
-                <div className="lg:col-7">
-                  <h2 className="h1 text-white">Helping teams in the world with focus</h2>
-                  <a className="btn btn-white mt-8" href="#">
-                    Download The Theme
-                  </a>
-                </div>
-                <div className="mt-8 lg:col-5 lg:mt-0">
-                  <p className="text-white">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi egestas Werat viverra id et aliquet.
-                    vulputate egestas sollicitudin .
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BottomBanner />
     </>
   );
 };

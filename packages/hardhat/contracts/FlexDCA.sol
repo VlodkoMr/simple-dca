@@ -244,7 +244,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         }
 
         IERC20(strategy.fromAsset).approve(address(balancerVault), _totalSwap);
-        uint256 _result = swap(
+        uint256 _result = balancerSwap(
             strategy.fromAsset,
             strategy.toAsset,
             strategy.balancerPoolId,
@@ -264,7 +264,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
 
     // ---------------------- Private ----------------------
 
-    function swap(
+    function balancerSwap(
         address _fromAsset,
         address _toAsset,
         bytes32 _balancerPoolId,
@@ -341,12 +341,12 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     // ---------------------- OnlyOwner ----------------------
 
     function newStrategy(
-        string memory _title,
-        address _fromAsset,
-        address _toAsset,
-        bytes32 _balancerPoolId,
-        uint32 _usersLimit
-    ) public onlyOwner {
+        string memory _title, address _fromAsset, address _toAsset,
+        bytes32 _balancerPoolId, uint32 _usersLimit
+    )
+    public
+    onlyOwner
+    {
         require(bytes(_title).length > 0, "DCA#11: title is required");
         require(_fromAsset != address(0), "DCA#08: fromAsset is zero address");
         require(_balancerPoolId != bytes32(0), "DCA#09: balancerPoolId is zero");
@@ -362,6 +362,15 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             totalAmountToAsset: 0,
             usersLimit: _usersLimit
         });
+    }
+
+    function updatePoolId(uint32 _strategyId, bytes32 _balancerPoolId)
+    public
+    strategyExists(_strategyId)
+    onlyOwner
+    {
+        require(_balancerPoolId != bytes32(0), "DCA#09: balancerPoolId is zero");
+        strategies[_strategyId].balancerPoolId = _balancerPoolId;
     }
 
 }
