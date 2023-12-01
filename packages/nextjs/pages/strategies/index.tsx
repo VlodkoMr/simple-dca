@@ -3,11 +3,8 @@ import {MetaHeader} from "~~/components/MetaHeader";
 import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
 import React, {useEffect, useMemo, useState} from "react";
 import {useAccount} from "wagmi";
-import Link from "next/link";
 import {JoinStrategy} from "~~/components/modals/JoinStrategy";
-import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {useTokensDecimal} from "~~/hooks/useTokensDecimal";
-import {formatUnits} from "viem";
 import {DepositStrategy} from "~~/components/modals/DepositStrategy";
 import {OneStrategy} from "~~/components/OneStrategy";
 
@@ -35,7 +32,6 @@ const Strategies: NextPage = () => {
     cacheTime: 3_000,
   });
 
-
   useEffect(() => {
     if (myStrategies) {
       const strategyObj: Record<number, UserStrategy> = {};
@@ -45,8 +41,6 @@ const Strategies: NextPage = () => {
       setMyStrategiesObj(strategyObj);
     }
   }, [myStrategies]);
-
-  console.log(`myStrategiesObj`, myStrategiesObj);
 
   const handleJoin = (e, strategy) => {
     e.stopPropagation();
@@ -88,7 +82,7 @@ const Strategies: NextPage = () => {
       <MetaHeader />
 
       <div className={"container"}>
-        <h2 className={"text-center"}>Strategies</h2>
+        <h2 className={"text-center mt-6"}>Strategies</h2>
 
         <div className={"flex flex-row justify-between"}>
           <div className={"text-right flex flex-row gap-10 mt-2.5"}>

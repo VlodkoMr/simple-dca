@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     FlexDCA: {
-      address: "0xdaa1bF30aC0D78b83F67943D6565c8f0b4505A4f",
+      address: "0xb0B5BC32dfCDBdEE6116d688eA5Ea1D93eb21194",
       abi: [
         {
           inputs: [
@@ -333,6 +333,87 @@ const deployedContracts = {
               name: "_strategyId",
               type: "uint32",
             },
+          ],
+          name: "getStrategy",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint32",
+                  name: "id",
+                  type: "uint32",
+                },
+                {
+                  internalType: "uint32",
+                  name: "usersLimit",
+                  type: "uint32",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "assetFromTitle",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "assetToTitle",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "fromAsset",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "toAsset",
+                  type: "address",
+                },
+                {
+                  internalType: "bytes32",
+                  name: "balancerPoolId",
+                  type: "bytes32",
+                },
+                {
+                  internalType: "uint256",
+                  name: "totalBalance",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "totalAmountFromAsset",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "totalAmountToAsset",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "active",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct FlexDCA.Strategy",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
             {
               internalType: "uint256",
               name: "_executeRepeat",
@@ -423,80 +504,6 @@ const deployedContracts = {
           name: "renounceOwnership",
           outputs: [],
           stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-          ],
-          name: "strategies",
-          outputs: [
-            {
-              internalType: "uint32",
-              name: "id",
-              type: "uint32",
-            },
-            {
-              internalType: "uint32",
-              name: "usersLimit",
-              type: "uint32",
-            },
-            {
-              internalType: "string",
-              name: "title",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "assetFromTitle",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "assetToTitle",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "toAsset",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "balancerPoolId",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint256",
-              name: "totalBalance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalAmountFromAsset",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalAmountToAsset",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "active",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
           type: "function",
         },
         {

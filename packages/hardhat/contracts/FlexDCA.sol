@@ -20,7 +20,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     uint32 public totalStrategies;
     address public feeCollector;
 
-    mapping(uint32 => Strategy) public strategies;
+    mapping(uint32 => Strategy) private strategies;
     mapping(uint32 => address[]) public strategyUsers;
     mapping(address => mapping(uint32 => UserStrategyDetails)) public userStrategyDetails;
     mapping(address => uint32[]) public userStrategies;
@@ -77,6 +77,13 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         }
 
         feeCollector = _feeCollector;
+    }
+
+    function getStrategy(uint32 _strategyId)
+    public view
+    returns (Strategy memory)
+    {
+        return strategies[_strategyId];
     }
 
     function joinEditStrategy(uint32 _strategyId, uint256 _executeRepeat, uint256 _amountOnce)

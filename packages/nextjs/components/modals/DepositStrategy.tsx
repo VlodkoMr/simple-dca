@@ -35,7 +35,8 @@ export const DepositStrategy = ({
 
   useEffect(() => {
     const decimals = fromToken?.decimals || 0;
-    setTotalDepositWei(parseUnits(totalDeposit.toString(), decimals));
+    const deposit = totalDeposit ? parseUnits(totalDeposit.toString(), decimals) : 0;
+    setTotalDepositWei(deposit);
   }, [totalDeposit]);
 
 

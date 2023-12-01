@@ -4,6 +4,7 @@ import {BigNumber} from "@ethersproject/bignumber";
 import {erc20ABI, useAccount, useContractRead, useToken} from "wagmi";
 import {formatUnits, parseUnits} from "viem";
 import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
+import {repeatOptions} from "~~/config/constants";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -48,7 +49,8 @@ export const JoinStrategy = ({
 
   useEffect(() => {
     const decimals = fromToken?.decimals || 0;
-    setTotalDepositWei(parseUnits(totalDeposit.toString(), decimals));
+    const deposit = totalDeposit ? parseUnits(totalDeposit.toString(), decimals) : 0;
+    setTotalDepositWei(deposit);
   }, [totalDeposit]);
 
 
@@ -175,16 +177,9 @@ export const JoinStrategy = ({
                   value={repeat.toString()}
                   className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
                   <option disabled selected>Choose schedule period</option>
-                  <option value={12}>Twice a day</option>
-                  <option value={24}>Once a day</option>
-                  <option value={84}>Twice a week</option>
-                  <option value={168}>Once a week</option>
-                  <option value={360}>Twice a month</option>
-                  <option value={720}>Once a month</option>
-                  <option value={1080}>Twice every 3 months</option>
-                  <option value={2160}>Once every 3 months</option>
-                  <option value={4320}>Once every 6 months</option>
-                  <option value={8640}>Once a year</option>
+                  {Object.keys(repeatOptions).map((option) => (
+                    <option key={option} value={option}>{repeatOptions[option]}</option>
+                  ))}
                 </select>
               </div>
 

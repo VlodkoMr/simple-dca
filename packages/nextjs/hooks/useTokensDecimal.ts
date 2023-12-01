@@ -26,7 +26,7 @@ export const useTokensDecimal = ({
 
   const fetchTokenDecimals = useCallback(() => {
     let tokensList: string[] = [];
-    allStrategies.map((strategy: Strategy) => {
+    allStrategies.filter(strategy => strategy).map((strategy: Strategy) => {
       if (tokensList.indexOf(strategy.fromAsset) === -1) {
         tokensList.push(strategy.fromAsset);
       }
