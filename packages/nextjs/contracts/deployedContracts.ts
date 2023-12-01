@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     FlexDCA: {
-      address: "0x4e5035Ca188c2D9f0f968093f8952c07C3139F25",
+      address: "0x936cDFB2a2A8C11525C71D672CbF047853b8c39d",
       abi: [
         {
           inputs: [
@@ -282,6 +282,11 @@ const deployedContracts = {
           outputs: [
             {
               components: [
+                {
+                  internalType: "uint32",
+                  name: "strategyId",
+                  type: "uint32",
+                },
                 {
                   internalType: "uint256",
                   name: "amountLeft",
@@ -630,6 +635,11 @@ const deployedContracts = {
           ],
           name: "userStrategyDetails",
           outputs: [
+            {
+              internalType: "uint32",
+              name: "strategyId",
+              type: "uint32",
+            },
             {
               internalType: "uint256",
               name: "amountLeft",

@@ -9,6 +9,10 @@ type MetaHeaderProps = {
   strategy: Strategy;
 };
 
+const defaultRepeat = 168;
+const defaultSplitCount = 10;
+const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
+
 export const JoinStrategy = ({
   strategy,
 }: MetaHeaderProps) => {
@@ -16,11 +20,9 @@ export const JoinStrategy = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState(0);
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
-  const [splitCount, setSplitCount] = useState(10);
-  const [repeat, setRepeat] = useState(0);
+  const [splitCount, setSplitCount] = useState(defaultSplitCount);
+  const [repeat, setRepeat] = useState(defaultRepeat);
   const [isLoading, setIsLoading] = useState(false);
-
-  const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
 
   const {data: fromToken} = useToken({
     address: strategy?.fromAsset,
@@ -55,8 +57,8 @@ export const JoinStrategy = ({
       setCurrentStep(1);
       setTotalDeposit(0);
       setTotalDepositWei(BigInt(0));
-      setSplitCount(10);
-      setRepeat(0);
+      setSplitCount(defaultSplitCount);
+      setRepeat(defaultRepeat);
       setIsLoading(false);
     }
   }, [strategy]);
@@ -64,7 +66,7 @@ export const JoinStrategy = ({
   const {writeAsync: joinStrategyWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
-    args: [strategy?.id, BigNumber.from(repeat).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
     enabled: !!strategy && !!amountOnce && repeat > 0,
     onError: (error) => {
       alert(error);
@@ -202,7 +204,7 @@ export const JoinStrategy = ({
               </div>
 
               <div className={"flex flex-row gap-4 mb-3"}>
-                <div className={"w-32 text-right"}>Pay once:</div>
+                <div className={"w-32 text-right"}>Amount once:</div>
                 <div>
                   {totalDeposit > 0 && splitCount > 0 ? (
                     <>

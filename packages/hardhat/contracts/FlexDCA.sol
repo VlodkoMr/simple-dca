@@ -101,6 +101,10 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             _userStrategyDetails.executeRepeat = _executeRepeat;
             _userStrategyDetails.amountOnce = _amountOnce;
             _userStrategyDetails.nextExecute = block.timestamp + _executeRepeat;
+
+            if (_userStrategyDetails.active == false) {
+                _activateUserStrategy(_strategyId, msg.sender);
+            }
         }
     }
 
@@ -358,7 +362,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         Strategy storage strategy = strategies[_strategyId];
         userStrategyDetails[_userId][_strategyId].active = true;
 
-        (, bool _exists) = Utils.indexOf(strategyUsers[_strategyId], _userId);
+        (, bool _exists) = Utils.indexOfAddress(strategyUsers[_strategyId], _userId);
         if (!_exists) {
             strategyUsers[_strategyId].push(_userId);
         }
@@ -372,14 +376,29 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     private
     {
         userStrategyDetails[_userId][_strategyId].active = false;
-        Strategy storage strategy = strategies[_strategyId];
 
-        (uint _index, bool _exists) = Utils.indexOf(strategyUsers[_strategyId], _userId);
-        if (_exists) {
-            strategyUsers[_strategyId][_index] = strategyUsers[_strategyId][strategyUsers[_strategyId].length - 1];
+        // remove from userStrategies
+        (uint _indexUs, bool _existsUs) = Utils.indexOfUint(userStrategies[_userId], _strategyId);
+        if (_existsUs) {
+            uint32 _countStrategies = uint32(userStrategies[_userId].length);
+            if (_countStrategies > 1) {
+                userStrategies[_userId][_indexUs] = userStrategies[_userId][_countStrategies - 1];
+            }
+            userStrategies[_userId].pop();
+        }
+
+        // remove from strategyUsers
+        (uint _indexSt, bool _existsSt) = Utils.indexOfAddress(strategyUsers[_strategyId], _userId);
+        if (_existsSt) {
+            uint32 _countUsers = uint32(strategyUsers[_strategyId].length);
+            if (_countUsers > 1) {
+                strategyUsers[_strategyId][_indexSt] = strategyUsers[_strategyId][_countUsers - 1];
+            }
             strategyUsers[_strategyId].pop();
         }
 
+        // Update common strategy active status
+        Strategy storage strategy = strategies[_strategyId];
         if (strategy.active == false) {
             strategy.active = true;
         }
