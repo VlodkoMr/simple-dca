@@ -172,7 +172,7 @@ export const JoinStrategy = ({
                   onChange={(e) => {
                     setRepeat(parseInt(e.target.value));
                   }}
-                  defaultValue={repeat}
+                  value={repeat.toString()}
                   className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
                   <option disabled selected>Choose schedule period</option>
                   <option value={12}>Twice a day</option>
@@ -191,7 +191,7 @@ export const JoinStrategy = ({
               <div className={"flex flex-row gap-4 mb-3"}>
                 <div className={"w-32 pt-3 text-right"}>Split to:</div>
                 <select
-                  defaultValue={splitCount}
+                  value={splitCount.toString()}
                   onChange={(e) => {
                     setSplitCount(parseInt(e.target.value));
                   }}
@@ -234,7 +234,7 @@ export const JoinStrategy = ({
 
               <ul className="steps gap-4">
                 <li className={`step ${currentStep >= 1 && "step-primary"}`}>Join Strategy</li>
-                <li className={`step ${currentStep >= 2 && "step-primary"}`}>Approve {strategy.assetFromTitle}</li>
+                <li className={`step ${currentStep >= 2 && "step-primary"}`}>Approve</li>
                 <li className={`step ${currentStep === 3 && "step-primary"}`}>Deposit {strategy.assetFromTitle}</li>
               </ul>
             </div>

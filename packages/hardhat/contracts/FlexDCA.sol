@@ -362,8 +362,15 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         Strategy storage strategy = strategies[_strategyId];
         userStrategyDetails[_userId][_strategyId].active = true;
 
-        (, bool _exists) = Utils.indexOfAddress(strategyUsers[_strategyId], _userId);
-        if (!_exists) {
+        // Add to userStrategies
+        (, bool _existsUs) = Utils.indexOfUint(userStrategies[_userId], _strategyId);
+        if (!_existsUs) {
+            userStrategies[_userId].push(_strategyId);
+        }
+
+        // Add to strategyUsers
+        (, bool _existsSt) = Utils.indexOfAddress(strategyUsers[_strategyId], _userId);
+        if (!_existsSt) {
             strategyUsers[_strategyId].push(_userId);
         }
 

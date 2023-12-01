@@ -147,7 +147,7 @@ export const DepositStrategy = ({
               </div>
 
               <ul className="steps gap-4">
-                <li className={`step ${currentStep >= 1 && "step-primary"}`}>Approve {strategy.assetFromTitle}</li>
+                <li className={`step ${currentStep >= 1 && "step-primary"}`}>Approve</li>
                 <li className={`step ${currentStep === 2 && "step-primary"}`}>Deposit {strategy.assetFromTitle}</li>
               </ul>
             </div>

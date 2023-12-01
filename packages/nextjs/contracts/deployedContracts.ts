@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   5: {
     FlexDCA: {
-      address: "0x936cDFB2a2A8C11525C71D672CbF047853b8c39d",
+      address: "0xdaa1bF30aC0D78b83F67943D6565c8f0b4505A4f",
       abi: [
         {
           inputs: [

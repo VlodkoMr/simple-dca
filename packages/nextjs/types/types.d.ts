@@ -6,8 +6,9 @@ interface Strategy {
   assetToTitle: string;
   fromAsset: string;
   toAsset: string;
-  totalAmountFromAsset: string;
-  totalAmountToAsset: string;
+  totalAmountFromAsset: BigInt;
+  totalAmountToAsset: BigInt;
+  totalBalance: BigInt;
   usersLimit: number;
   balancerPoolId: string;
 }
