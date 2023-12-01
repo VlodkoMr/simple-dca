@@ -7,10 +7,12 @@ import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressW
 
 type MetaHeaderProps = {
   strategy: Strategy;
+  onUpdate: () => void;
 };
 
 export const DepositStrategy = ({
   strategy,
+  onUpdate
 }: MetaHeaderProps) => {
   const account = useAccount();
   const [currentStep, setCurrentStep] = useState(1);
@@ -79,6 +81,7 @@ export const DepositStrategy = ({
     onBlockConfirmation: (txnReceipt) => {
       console.log(`depositWrite txnReceipt`, txnReceipt);
       setIsLoading(false);
+      onUpdate();
       document.getElementById('deposit_strategy_modal')?.close();
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },

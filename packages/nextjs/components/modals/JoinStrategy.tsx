@@ -8,6 +8,7 @@ import {repeatOptions} from "~~/config/constants";
 
 type MetaHeaderProps = {
   strategy: Strategy;
+  onUpdate: () => void;
 };
 
 const defaultRepeat = 168;
@@ -16,6 +17,7 @@ const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
 
 export const JoinStrategy = ({
   strategy,
+  onUpdate
 }: MetaHeaderProps) => {
   const account = useAccount();
   const [currentStep, setCurrentStep] = useState(1);
@@ -73,6 +75,7 @@ export const JoinStrategy = ({
     onError: (error) => {
       alert(error);
       setIsLoading(false);
+      onUpdate();
     },
     onBlockConfirmation: (txnReceipt) => {
       console.log(`joinStrategyWrite txnReceipt`, txnReceipt);
@@ -115,6 +118,7 @@ export const JoinStrategy = ({
     onBlockConfirmation: (txnReceipt) => {
       console.log(`depositWrite txnReceipt`, txnReceipt);
       setIsLoading(false);
+      onUpdate();
       document.getElementById('join_strategy_modal')?.close();
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },

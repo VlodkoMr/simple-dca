@@ -56,7 +56,7 @@ const OneStrategy: NextPage = () => {
 
   console.log(`tokenDecimals`, tokenDecimals);
 
-  const {data: myStrategy} = useScaffoldContractRead({
+  const {data: myStrategy, refetch: refetchMyStrategy} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -91,6 +91,7 @@ const OneStrategy: NextPage = () => {
     },
     onBlockConfirmation: (txnReceipt) => {
       console.log(`claimTokens txnReceipt`, txnReceipt);
+      refetchMyStrategy();
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },
     onSuccess: (tx) => {
@@ -110,6 +111,7 @@ const OneStrategy: NextPage = () => {
     },
     onBlockConfirmation: (txnReceipt) => {
       console.log(`depositWrite txnReceipt`, txnReceipt);
+      refetchMyStrategy();
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },
     onSuccess: (tx) => {
@@ -268,8 +270,8 @@ const OneStrategy: NextPage = () => {
             </section>
           </div>
 
-          <JoinStrategy strategy={strategy} />
-          <DepositStrategy strategy={strategy} />
+          <JoinStrategy strategy={strategy} onUpdate={() => refetchMyStrategy()} />
+          <DepositStrategy strategy={strategy} onUpdate={() => refetchMyStrategy()} />
         </>
       )}
 

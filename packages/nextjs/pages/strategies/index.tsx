@@ -138,8 +138,10 @@ const Strategies: NextPage = () => {
         </div>
       </div>
 
-      <JoinStrategy strategy={joinStrategy} />
-      <DepositStrategy strategy={depositStrategy} />
+      <JoinStrategy strategy={joinStrategy} onUpdate={() => {
+      }} />
+      <DepositStrategy strategy={depositStrategy} onUpdate={() => {
+      }} />
     </>
   );
 };
