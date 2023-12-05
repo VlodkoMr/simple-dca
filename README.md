@@ -30,7 +30,8 @@ yarn install
 yarn chain
 ```
 
-This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can
+This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and
+development. You can
 customize the network configuration in `hardhat.config.ts`.
 
 3. On a second terminal, deploy the test contract:
@@ -39,8 +40,10 @@ customize the network configuration in `hardhat.config.ts`.
 yarn deploy
 ```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs.
-The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy
+This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified
+to suit your needs.
+The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also
+customize the deploy
 script.
 
 4. On a third terminal, start your NextJS app:
@@ -54,6 +57,13 @@ yarn start
 ``` 
 yarn deploy --network goerli --reset
 yarn verify --network goerli
+```
+
+### Deploy and Verify on Sepolia:
+
+``` 
+yarn deploy --network sepolia --reset
+yarn verify --network sepolia
 ```
 
 ### Deploy and Verify on Polygon zkEVM:

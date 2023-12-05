@@ -1,15 +1,15 @@
-import type {NextPage} from "next";
-import {MetaHeader} from "~~/components/MetaHeader";
-import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import React, {useEffect, useMemo, useState} from "react";
-import {useAccount} from "wagmi";
-import {JoinStrategy} from "~~/components/modals/JoinStrategy";
-import {useTokensDecimal} from "~~/hooks/useTokensDecimal";
-import {DepositStrategy} from "~~/components/modals/DepositStrategy";
-import {OneStrategy} from "~~/components/OneStrategy";
+import type { NextPage } from "next";
+import { MetaHeader } from "~~/components/MetaHeader";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import React, { useEffect, useMemo, useState } from "react";
+import { useAccount } from "wagmi";
+import { JoinStrategy } from "~~/components/modals/JoinStrategy";
+import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
+import { DepositStrategy } from "~~/components/modals/DepositStrategy";
+import { OneStrategy } from "~~/components/OneStrategy";
 
 const Strategies: NextPage = () => {
-  const {address} = useAccount();
+  const { address } = useAccount();
   const [onlyMyStrategies, setOnlyMyStrategies] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [joinStrategy, setJoinStrategy] = useState();
@@ -17,15 +17,15 @@ const Strategies: NextPage = () => {
   const [myStrategiesObj, setMyStrategiesObj] = useState({});
   const [searchText, setSearchText] = useState("");
 
-  const {data: allStrategies} = useScaffoldContractRead({
+  const { data: allStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
   });
 
-  const {tokenDecimals} = useTokensDecimal({allStrategies});
+  const { tokenDecimals } = useTokensDecimal({ allStrategies });
 
-  const {data: myStrategies} = useScaffoldContractRead({
+  const { data: myStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -82,7 +82,7 @@ const Strategies: NextPage = () => {
       <MetaHeader />
 
       <div className={"container"}>
-        <h2 className={"text-center mt-6"}>Strategies</h2>
+        <h2 className={"text-center mt-6 mb-4"}>Strategies</h2>
 
         <div className={"flex flex-row justify-between"}>
           <div className={"text-right flex flex-row gap-10 mt-2.5"}>
@@ -114,7 +114,7 @@ const Strategies: NextPage = () => {
         </div>
 
         <div className={"mt-2 flex w-full justify-between flex-nowrap px-8 py-4 text-sm font-semibold"}>
-          <div className={"w-8"}></div>
+          <div className={"w-8"}>#</div>
           <div className={"w-1/6 min-w-32"}>Name</div>
           <div className={"w-24 text-right"}>From</div>
           <div className={"w-8"}></div>
@@ -122,20 +122,28 @@ const Strategies: NextPage = () => {
           <div className={"w-1/6 min-w-32"}>Total Queue</div>
           <div className={"w-28"}>Status</div>
           <div className={"w-1/5"}>My Position</div>
-          <div className={"w-32 text-right"}></div>
+          <div className={"w-32 text-right"}>Action</div>
         </div>
 
-        <div className={"mb-24"}>
-          {allStrategiesFiltered?.map((strategy, index) => (
-            <OneStrategy strategy={strategy}
-                         myStrategiesObj={myStrategiesObj}
-                         handleDeposit={handleDeposit}
-                         handleJoin={handleJoin}
-                         index={index}
-                         tokenDecimals={tokenDecimals}
-            />
-          ))}
-        </div>
+
+        {tokenDecimals && Object.keys(tokenDecimals).length > 0 && myStrategies ? (
+          <div className={"mb-24"}>
+            {allStrategiesFiltered?.map((strategy, index) => (
+              <OneStrategy strategy={strategy}
+                           key={index}
+                           myStrategiesObj={myStrategiesObj}
+                           handleDeposit={handleDeposit}
+                           handleJoin={handleJoin}
+                           index={index}
+                           tokenDecimals={tokenDecimals}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={"text-center"}>
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        )}
       </div>
 
       <JoinStrategy strategy={joinStrategy} onUpdate={() => {

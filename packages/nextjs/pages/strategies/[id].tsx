@@ -1,23 +1,23 @@
-import type {NextPage} from "next";
-import {MetaHeader} from "~~/components/MetaHeader";
+import type { NextPage } from "next";
+import { MetaHeader } from "~~/components/MetaHeader";
 import React from "react";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {erc20ABI, useAccount, useContractReads} from "wagmi";
-import {formatUnits} from "viem";
-import {repeatOptions} from "~~/config/constants";
-import {JoinStrategy} from "~~/components/modals/JoinStrategy";
-import {DepositStrategy} from "~~/components/modals/DepositStrategy";
+import { useRouter } from "next/router";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { erc20ABI, useAccount, useContractReads } from "wagmi";
+import { formatUnits } from "viem";
+import { repeatOptions } from "~~/config/constants";
+import { JoinStrategy } from "~~/components/modals/JoinStrategy";
+import { DepositStrategy } from "~~/components/modals/DepositStrategy";
 
 const OneStrategy: NextPage = () => {
   const router = useRouter();
-  const {id} = router.query;
-  const {address} = useAccount();
+  const { id } = router.query;
+  const { address } = useAccount();
 
   console.log(`id`, id);
 
-  const {data: strategy} = useScaffoldContractRead({
+  const { data: strategy } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getStrategy",
     enabled: !!id,
@@ -28,7 +28,7 @@ const OneStrategy: NextPage = () => {
 
   console.log(`strategy`, strategy);
 
-  const {data: tokenDecimals} = useContractReads({
+  const { data: tokenDecimals } = useContractReads({
     contracts: [
       {
         address: strategy?.fromAsset,
@@ -56,7 +56,7 @@ const OneStrategy: NextPage = () => {
 
   console.log(`tokenDecimals`, tokenDecimals);
 
-  const {data: myStrategy, refetch: refetchMyStrategy} = useScaffoldContractRead({
+  const { data: myStrategy, refetch: refetchMyStrategy } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -81,7 +81,7 @@ const OneStrategy: NextPage = () => {
     }).format(timestamp * 1000);
   }
 
-  const {writeAsync: claimWrite} = useScaffoldContractWrite({
+  const { writeAsync: claimWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "claimTokens",
     args: [strategy?.id],
@@ -101,7 +101,7 @@ const OneStrategy: NextPage = () => {
     }
   });
 
-  const {writeAsync: exitWrite} = useScaffoldContractWrite({
+  const { writeAsync: exitWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "exitStrategy",
     args: [strategy?.id],
@@ -133,7 +133,7 @@ const OneStrategy: NextPage = () => {
     <>
       <MetaHeader />
 
-      {strategy && (
+      {strategy && tokenDecimals && Object.keys(tokenDecimals).length > 0 ? (
         <>
           <section className="container page-hero pt-6 pb-4">
             <div className="row justify-center">
@@ -189,11 +189,12 @@ const OneStrategy: NextPage = () => {
                             ${myStrategy && myStrategy?.active ? "bg-orange-50 border-orange-100" : "bg-base-300"}
                             `}>
                             <h3 className={"text-xl font-semibold mb-1 text-gray-700"}>{strategy.assetFromTitle}</h3>
-                            <small className={"text-xsm block"}>{strategy.fromAsset}</small>
+                            <small className={"text-xsm block opacity-80"}>{strategy.fromAsset}</small>
                             {myStrategy && (
-                              <small className={"font-semibold"}>
-                                Balance: {myStrategy?.amountLeft ? formatUnits(myStrategy?.amountLeft, tokenDecimals[strategy.fromAsset]) : "0"} {strategy.assetFromTitle}
-                              </small>
+                              <p className={"font-semibold"}>
+                                <span className={"mr-1"}>My Balance:</span>
+                                {myStrategy?.amountLeft ? formatUnits(myStrategy?.amountLeft, tokenDecimals[strategy.fromAsset]) : "0"} {strategy.assetFromTitle}
+                              </p>
                             )}
                           </div>
                           <div className={`
@@ -205,11 +206,12 @@ const OneStrategy: NextPage = () => {
                           ${myStrategy && myStrategy?.active ? "bg-orange-50 border-orange-100" : "bg-base-300"}
                           `}>
                             <h3 className={"text-xl font-semibold mb-1 text-gray-700"}>{strategy.assetToTitle}</h3>
-                            <small className={"text-xsm block"}>{strategy.toAsset}</small>
+                            <small className={"text-xsm block opacity-80"}>{strategy.toAsset}</small>
                             {myStrategy && (
-                              <small className={"font-semibold"}>
-                                Balance: {myStrategy?.claimAvailable ? formatUnits(myStrategy?.claimAvailable, tokenDecimals[strategy.toAsset]) : "0"} {strategy.assetToTitle}
-                              </small>
+                              <p className={"font-semibold"}>
+                                <span className={"mr-1"}>My Balance:</span>
+                                {myStrategy?.claimAvailable ? formatUnits(myStrategy?.claimAvailable, tokenDecimals[strategy.toAsset]) : "0"} {strategy.assetToTitle}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -243,7 +245,8 @@ const OneStrategy: NextPage = () => {
                             <div className={"flex flex-row gap-10 mt-5"}>
                               <div className={"flex-1 text-right"}>
                                 <p>Status: {myStrategy.active ? "active" : "not active"}</p>
-                                <p>Amount once: {formatUnits(myStrategy?.amountOnce, tokenDecimals[strategy.fromAsset])} {strategy.assetFromTitle}</p>
+                                <p>Amount
+                                  once: {formatUnits(myStrategy?.amountOnce, tokenDecimals[strategy.fromAsset])} {strategy.assetFromTitle}</p>
                               </div>
                               <div className={"flex-1 "}>
                                 <p>Repeat: {repeatOptions[parseInt(myStrategy.executeRepeat) / 3600]}</p>
@@ -273,6 +276,10 @@ const OneStrategy: NextPage = () => {
           <JoinStrategy strategy={strategy} onUpdate={() => refetchMyStrategy()} />
           <DepositStrategy strategy={strategy} onUpdate={() => refetchMyStrategy()} />
         </>
+      ) : (
+        <div className={"text-center"}>
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
       )}
 
     </>

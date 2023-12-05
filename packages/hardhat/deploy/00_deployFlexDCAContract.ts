@@ -1,6 +1,6 @@
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {DeployFunction} from "hardhat-deploy/types";
-import {network} from "hardhat";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { network } from "hardhat";
 
 /**
  * Deploys a contract named "YourContract" using the deployer account and
@@ -19,12 +19,13 @@ const deployFlexDCA: DeployFunction = async function (hre: HardhatRuntimeEnviron
     with a random private key in the .env file (then used on hardhat.config.ts)
     You can run the `yarn account` command to check your balance in every network.
   */
-  const {deployer} = await hre.getNamedAccounts();
-  const {deploy} = hre.deployments;
+  const { deployer } = await hre.getNamedAccounts();
+  const { deploy } = hre.deployments;
 
   const feeCollector = deployer;
   const balancerVaultAddress = "0xBA12222222228d8Ba445958a75a0704d566BF2C8";
   const uniswapSwapRouter: Record<string, string> = {
+    sepolia: "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
     goerli: "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
     polygon: "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
     polygonZkEvm: "",

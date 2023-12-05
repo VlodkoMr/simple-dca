@@ -9,11 +9,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./helpers/utils.sol";
 import "./interface/ISwapRouterUniswap.sol";
+import "./interface/IBridge.sol";
 
 contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     using SafeERC20 for IERC20;
     IBalancerVault private immutable balancerVault;
     ISwapRouterUniswap private immutable uniswapSwapRouter;
+    IBridge public bridgeContract;
 
     uint16 private constant STRATEGY_FEE_PCT = 1; // 1.0%
     uint16 private constant STRATEGY_FEE_DENOMINATOR = 100;
@@ -37,7 +39,8 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         uint256 totalBalance;
         uint256 totalAmountFromAsset;
         uint256 totalAmountToAsset;
-        bool active;
+        bool isActive;
+        bool isBridge;
     }
 
     struct UserStrategyDetails {
@@ -47,7 +50,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         uint256 claimAvailable;
         uint256 nextExecute;
         uint256 executeRepeat;
-        bool active;
+        bool isActive;
     }
 
     modifier userStrategyExists(uint32 _strategyId) {
@@ -100,7 +103,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
                 nextExecute: block.timestamp + _executeRepeat,
                 claimAvailable: 0,
                 executeRepeat: _executeRepeat,
-                active: false
+                isActive: false
             });
             userStrategies[msg.sender].push(_strategyId);
         } else {
@@ -109,7 +112,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             _userStrategyDetails.amountOnce = _amountOnce;
             _userStrategyDetails.nextExecute = block.timestamp + _executeRepeat;
 
-            if (_userStrategyDetails.active == false) {
+            if (_userStrategyDetails.isActive == false) {
                 _activateUserStrategy(_strategyId, msg.sender);
             }
         }
@@ -131,7 +134,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
         userStrategyDetail.amountLeft += _amount;
 
-        if (userStrategyDetail.active == false) {
+        if (userStrategyDetail.isActive == false) {
             _activateUserStrategy(_strategyId, msg.sender);
         }
     }
@@ -299,6 +302,42 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         }
     }
 
+    function bridgeTokens(
+        uint64 _destinationChainSelector,
+        address _receiver,
+        uint32 _strategyId,
+        uint32 _destStrategyId,
+        uint256 _amount
+    )
+    public payable
+    strategyExists(_strategyId)
+    userStrategyExists(_strategyId)
+    {
+        require(_destStrategyId > 0, "DCA#15: destStrategyId is wrong");
+        require(_destinationChainSelector > 0, "DCA#15: destinationChainSelector is wrong");
+        require(strategies[_strategyId].isBridge, "DCA#13: strategy bridge is not available");
+        require(_amount > 0, "DCA#04: amount must be greater than 0");
+        require(msg.value > 0, "DCA#04: Wrong fees");
+
+        UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
+        Strategy storage strategy = strategies[_strategyId];
+
+        require(userStrategyDetail.amountLeft < _amount, "DCA#14: amount exceeds balance");
+        userStrategyDetail.amountLeft -= _amount;
+        strategy.totalBalance -= _amount;
+
+        // transfer native token fees to bridge
+        (bool _transferResult,) = payable(address(bridgeContract)).call{value: msg.value}("");
+        require(_transferResult, "DCA#16: fees transfer failed");
+
+        string memory _data = string(abi.encodePacked(
+            _destStrategyId,
+            _amount,
+            msg.sender
+        ));
+        bridgeContract.bridgeTokens(_destinationChainSelector, _receiver, _data);
+    }
+
     // ---------------------- Private ----------------------
 
     function balancerSwap(
@@ -367,7 +406,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         require(strategyUsers[_strategyId].length < strategies[_strategyId].usersLimit, "DCA#06: Strategy users limit reached");
 
         Strategy storage strategy = strategies[_strategyId];
-        userStrategyDetails[_userId][_strategyId].active = true;
+        userStrategyDetails[_userId][_strategyId].isActive = true;
 
         // Add to userStrategies
         (, bool _existsUs) = Utils.indexOfUint(userStrategies[_userId], _strategyId);
@@ -381,15 +420,15 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             strategyUsers[_strategyId].push(_userId);
         }
 
-        if (strategy.active == true && strategyUsers[_strategyId].length >= strategies[_strategyId].usersLimit) {
-            strategy.active = false;
+        if (strategy.isActive == true && strategyUsers[_strategyId].length >= strategies[_strategyId].usersLimit) {
+            strategy.isActive = false;
         }
     }
 
     function _deactivateUserStrategy(uint32 _strategyId, address _userId)
     private
     {
-        userStrategyDetails[_userId][_strategyId].active = false;
+        userStrategyDetails[_userId][_strategyId].isActive = false;
 
         // remove from userStrategies
         (uint _indexUs, bool _existsUs) = Utils.indexOfUint(userStrategies[_userId], _strategyId);
@@ -413,8 +452,8 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
 
         // Update common strategy active status
         Strategy storage strategy = strategies[_strategyId];
-        if (strategy.active == false) {
-            strategy.active = true;
+        if (strategy.isActive == false) {
+            strategy.isActive = true;
         }
     }
 
@@ -431,14 +470,15 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     private view
     returns (bool)
     {
-        return _sDetails.active && _sDetails.nextExecute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
+        return _sDetails.isActive && _sDetails.nextExecute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
     }
 
     // ---------------------- OnlyOwner ----------------------
 
+    // Create new strategy
     function newStrategy(
         string memory _title, string memory _assetFromTitle, string memory _assetToTitle,
-        address _fromAsset, address _toAsset, bytes32 _balancerPoolId, uint32 _usersLimit
+        address _fromAsset, address _toAsset, bytes32 _balancerPoolId, bool _bridge, uint32 _usersLimit
     )
     public
     onlyOwner
@@ -461,10 +501,12 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             totalAmountFromAsset: 0,
             totalAmountToAsset: 0,
             usersLimit: _usersLimit,
-            active: true
+            isActive: true,
+            isBridge: _bridge
         });
     }
 
+    // Switch strategy balancer pool
     function updateStrategyPoolId(uint32 _strategyId, bytes32 _balancerPoolId)
     public
     strategyExists(_strategyId)
@@ -472,6 +514,24 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     {
         require(_balancerPoolId != bytes32(0), "DCA#09: balancerPoolId is zero");
         strategies[_strategyId].balancerPoolId = _balancerPoolId;
+    }
+
+    // Switch bridge mode for strategy
+    function updateStrategyBridge(uint32 _strategyId, bool _isBridge)
+    public
+    strategyExists(_strategyId)
+    onlyOwner
+    {
+        strategies[_strategyId].isBridge = _isBridge;
+    }
+
+    // Update bridge contract address
+    function setBridgeAddress(address _bridgeAddress)
+    public
+    onlyOwner
+    {
+        require(address(bridgeContract) == address(0), "DCA#12: bridge address already set");
+        bridgeContract = IBridge(_bridgeAddress);
     }
 
 }
