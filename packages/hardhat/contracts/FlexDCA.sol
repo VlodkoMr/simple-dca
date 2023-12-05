@@ -4,6 +4,7 @@ pragma solidity 0.8.23;
 import "hardhat/console.sol";
 import "./interface/IBalancerVault.sol";
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -36,6 +37,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         address fromAsset;
         address toAsset;
         bytes32 balancerPoolId;
+        address dataFeed;
         uint256 totalBalance;
         uint256 totalAmountFromAsset;
         uint256 totalAmountToAsset;
@@ -263,6 +265,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         uint256 _totalSwap = 0;
         Strategy storage strategy = strategies[_strategyId];
 
+        // calculate total swap amount, update user strategies
         for (uint32 _i = 0; _i < _users.length; _i++) {
             UserStrategyDetails storage userStrategyDetail = userStrategyDetails[_users[_i]][_strategyId];
             _totalSwap += userStrategyDetail.amountOnce;
@@ -270,17 +273,18 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             userStrategyDetail.nextExecute += userStrategyDetail.executeRepeat;
         }
 
-        uint256 _result = 0;
+        // swap tokens
+        uint256 _returnAssetResult = 0;
         if (strategy.balancerPoolId == bytes32(0)) {
             // uniswap
-            _result = uniswapSwap(
+            _returnAssetResult = uniswapSwap(
                 strategy.fromAsset,
                 strategy.toAsset,
                 _totalSwap
             );
         } else {
             // balancer
-            _result = balancerSwap(
+            _returnAssetResult = balancerSwap(
                 strategy.fromAsset,
                 strategy.toAsset,
                 strategy.balancerPoolId,
@@ -288,17 +292,25 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             );
         }
 
-        require(_result > 0, "DCA#07: swap failed, no result returned");
+        // Check returned amount using data feed
+        if (strategy.dataFeed != address(0)) {
+            _checkReturnedSwapAmount(strategy, _returnAssetResult);
+        } else {
+            // no data fees, basic check
+            require(_returnAssetResult > 0, "DCA#06: swap failed, no result returned");
+        }
 
+        // update general strategy stats
         strategy.totalAmountFromAsset += _totalSwap;
-        strategy.totalAmountToAsset += _result;
+        strategy.totalAmountToAsset += _returnAssetResult;
         strategy.totalBalance -= _totalSwap;
 
+        // distribute token amounts for each user
         uint256 _denominator = 10 ** 18;
         for (uint32 _i = 0; _i < _users.length; _i++) {
             UserStrategyDetails storage userStrategyDetail = userStrategyDetails[_users[_i]][_strategyId];
             uint256 _userPart = userStrategyDetail.amountOnce * _denominator / _totalSwap;
-            userStrategyDetail.claimAvailable += (_result * _userPart) / _denominator;
+            userStrategyDetail.claimAvailable += (_returnAssetResult * _userPart) / _denominator;
         }
     }
 
@@ -313,22 +325,22 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     strategyExists(_strategyId)
     userStrategyExists(_strategyId)
     {
-        require(_destStrategyId > 0, "DCA#15: destStrategyId is wrong");
-        require(_destinationChainSelector > 0, "DCA#15: destinationChainSelector is wrong");
-        require(strategies[_strategyId].isBridge, "DCA#13: strategy bridge is not available");
-        require(_amount > 0, "DCA#04: amount must be greater than 0");
-        require(msg.value > 0, "DCA#04: Wrong fees");
+        require(_destStrategyId > 0, "DCA#07: destStrategyId is wrong");
+        require(_destinationChainSelector > 0, "DCA#08: destinationChainSelector is wrong");
+        require(strategies[_strategyId].isBridge, "DCA#09: strategy bridge is not available");
+        require(_amount > 0, "DCA#10: amount must be greater than 0");
+        require(msg.value > 0, "DCA#11: Wrong fees");
 
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
         Strategy storage strategy = strategies[_strategyId];
 
-        require(userStrategyDetail.amountLeft < _amount, "DCA#14: amount exceeds balance");
+        require(userStrategyDetail.amountLeft < _amount, "DCA#12: amount exceeds balance");
         userStrategyDetail.amountLeft -= _amount;
         strategy.totalBalance -= _amount;
 
         // transfer native token fees to bridge
         (bool _transferResult,) = payable(address(bridgeContract)).call{value: msg.value}("");
-        require(_transferResult, "DCA#16: fees transfer failed");
+        require(_transferResult, "DCA#13: fees transfer failed");
 
         string memory _data = string(abi.encodePacked(
             _destStrategyId,
@@ -395,7 +407,6 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             amountOutMinimum: 0,
             sqrtPriceLimitX96: 0
         });
-        // TODO: amountOutMinimum check with oracle
 
         return uniswapSwapRouter.exactInputSingle(_params);
     }
@@ -403,7 +414,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     function _activateUserStrategy(uint32 _strategyId, address _userId)
     private
     {
-        require(strategyUsers[_strategyId].length < strategies[_strategyId].usersLimit, "DCA#06: Strategy users limit reached");
+        require(strategyUsers[_strategyId].length < strategies[_strategyId].usersLimit, "DCA#14: Strategy users limit reached");
 
         Strategy storage strategy = strategies[_strategyId];
         userStrategyDetails[_userId][_strategyId].isActive = true;
@@ -460,7 +471,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     function _transferTokens(address _asset, address _recipient, uint256 _amount)
     private
     {
-        require(_asset != address(0), "DCA#08: asset is zero address");
+        require(_asset != address(0), "DCA#15: asset is zero address");
 
         IERC20 token = IERC20(_asset);
         SafeERC20.safeTransfer(token, _recipient, _amount);
@@ -473,20 +484,33 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         return _sDetails.isActive && _sDetails.nextExecute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
     }
 
+    function _checkReturnedSwapAmount(Strategy storage strategy, uint256 _returnAssetResult)
+    private
+    {
+        AggregatorV3Interface _priceFeed = AggregatorV3Interface(strategy.dataFeed);
+        (, int256 _lastPrice, , ,) = _priceFeed.latestRoundData();
+
+        // NOTE: scaled up by 10 ** 8;
+        // TODO: check if price is correct, include slippage
+        // TODO: revert on fail
+        // revert("DCA#16: wrong returned amount")
+    }
+
     // ---------------------- OnlyOwner ----------------------
 
     // Create new strategy
     function newStrategy(
         string memory _title, string memory _assetFromTitle, string memory _assetToTitle,
-        address _fromAsset, address _toAsset, bytes32 _balancerPoolId, bool _bridge, uint32 _usersLimit
+        address _fromAsset, address _toAsset, bytes32 _balancerPoolId, address _dataFeed,
+        bool _bridge, uint32 _usersLimit
     )
     public
     onlyOwner
     {
-        require(bytes(_title).length > 0, "DCA#11: title is required");
-        require(_fromAsset != address(0), "DCA#08: fromAsset is zero address");
-        require(_toAsset != address(0), "DCA#08: toAsset is zero address");
-        require(_usersLimit > 0, "DCA#10: usersLimit must be greater than 0");
+        require(bytes(_title).length > 0, "DCA#16: title is required");
+        require(_fromAsset != address(0), "DCA#17: fromAsset is zero address");
+        require(_toAsset != address(0), "DCA#18: toAsset is zero address");
+        require(_usersLimit > 0, "DCA#19: usersLimit must be greater than 0");
 
         totalStrategies++;
         strategies[totalStrategies] = Strategy({
@@ -497,6 +521,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             fromAsset: _fromAsset,
             toAsset: _toAsset,
             balancerPoolId: _balancerPoolId,
+            dataFeed: _dataFeed,
             totalBalance: 0,
             totalAmountFromAsset: 0,
             totalAmountToAsset: 0,
@@ -512,7 +537,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     strategyExists(_strategyId)
     onlyOwner
     {
-        require(_balancerPoolId != bytes32(0), "DCA#09: balancerPoolId is zero");
+        require(_balancerPoolId != bytes32(0), "DCA#20: balancerPoolId is zero");
         strategies[_strategyId].balancerPoolId = _balancerPoolId;
     }
 
@@ -525,12 +550,21 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         strategies[_strategyId].isBridge = _isBridge;
     }
 
+    // Switch chainlink data feed for strategy
+    function updateStrategyDataFeed(uint32 _strategyId, address _dataFeed)
+    public
+    strategyExists(_strategyId)
+    onlyOwner
+    {
+        strategies[_strategyId].dataFeed = _dataFeed;
+    }
+
     // Update bridge contract address
     function setBridgeAddress(address _bridgeAddress)
     public
     onlyOwner
     {
-        require(address(bridgeContract) == address(0), "DCA#12: bridge address already set");
+        require(address(bridgeContract) == address(0), "DCA#21: bridge address already set");
         bridgeContract = IBridge(_bridgeAddress);
     }
 
