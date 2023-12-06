@@ -1,23 +1,23 @@
-import type { NextPage } from "next";
-import { MetaHeader } from "~~/components/MetaHeader";
+import type {NextPage} from "next";
+import {MetaHeader} from "~~/components/MetaHeader";
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { erc20ABI, useAccount, useContractReads } from "wagmi";
-import { formatUnits } from "viem";
-import { repeatOptions } from "~~/config/constants";
-import { JoinStrategy } from "~~/components/modals/JoinStrategy";
-import { DepositStrategy } from "~~/components/modals/DepositStrategy";
+import {useRouter} from "next/router";
+import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import {erc20ABI, useAccount, useContractReads} from "wagmi";
+import {formatUnits} from "viem";
+import {repeatOptions} from "~~/config/constants";
+import {JoinStrategy} from "~~/components/modals/JoinStrategy";
+import {DepositStrategy} from "~~/components/modals/DepositStrategy";
 
 const OneStrategy: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
-  const { address } = useAccount();
+  const {id} = router.query;
+  const {address} = useAccount();
 
   console.log(`id`, id);
 
-  const { data: strategy } = useScaffoldContractRead({
+  const {data: strategy} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getStrategy",
     enabled: !!id,
@@ -28,7 +28,7 @@ const OneStrategy: NextPage = () => {
 
   console.log(`strategy`, strategy);
 
-  const { data: tokenDecimals } = useContractReads({
+  const {data: tokenDecimals} = useContractReads({
     contracts: [
       {
         address: strategy?.fromAsset,
@@ -56,7 +56,7 @@ const OneStrategy: NextPage = () => {
 
   console.log(`tokenDecimals`, tokenDecimals);
 
-  const { data: myStrategy, refetch: refetchMyStrategy } = useScaffoldContractRead({
+  const {data: myStrategy, refetch: refetchMyStrategy} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -81,7 +81,7 @@ const OneStrategy: NextPage = () => {
     }).format(timestamp * 1000);
   }
 
-  const { writeAsync: claimWrite } = useScaffoldContractWrite({
+  const {writeAsync: claimWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "claimTokens",
     args: [strategy?.id],
@@ -101,7 +101,7 @@ const OneStrategy: NextPage = () => {
     }
   });
 
-  const { writeAsync: exitWrite } = useScaffoldContractWrite({
+  const {writeAsync: exitWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "exitStrategy",
     args: [strategy?.id],
@@ -139,10 +139,10 @@ const OneStrategy: NextPage = () => {
             <div className="row justify-center">
               <div className="lg:col-10 flex flex-row justify-between">
                 <ul
-                  className="breadcrumb inline-flex h-9 rounded-full btn btn-sm hover:bg-orange-100 mt-2.5 px-5"
+                  className="breadcrumb inline-flex h-9 rounded-full btn btn-sm hover:bg-orange-100 p-0 mt-2"
                 >
                   <li className="leading-none text-dark">
-                    <Link href={"/strategies"} className={" block"}>
+                    <Link href={"/strategies"} className={"px-5 block h-9 pt-2.5"}>
                       <small className="text-sm leading-none capitalize text-gray-600">&laquo; All Strategies</small>
                     </Link>
                   </li>
@@ -151,7 +151,7 @@ const OneStrategy: NextPage = () => {
                 <h2>{strategy.title}</h2>
 
                 <div className={"px-4 pt-3 w-42 text-right leading-3"}>
-                  {myStrategy && myStrategy?.active ? (
+                  {myStrategy && myStrategy?.isActive ? (
                     <div className={"mt-3 flex text-orange-500"}>
                       <span className={"text-xl leading-3 mr-2"}>•</span>
                       <div>strategy active</div>
@@ -186,7 +186,7 @@ const OneStrategy: NextPage = () => {
                           <div
                             className={`
                             grid flex-grow card rounded-box place-items-center shadow-md shadow-gray-100 border
-                            ${myStrategy && myStrategy?.active ? "bg-orange-50 border-orange-100" : "bg-base-300"}
+                            ${myStrategy && myStrategy?.isActive ? "bg-orange-50 border-orange-100" : "bg-base-300"}
                             `}>
                             <h3 className={"text-xl font-semibold mb-1 text-gray-700"}>{strategy.assetFromTitle}</h3>
                             <small className={"text-xsm block opacity-80"}>{strategy.fromAsset}</small>
@@ -199,11 +199,11 @@ const OneStrategy: NextPage = () => {
                           </div>
                           <div className={`
                           divider divider-horizontal font-semibold text-4xl
-                          ${myStrategy && myStrategy?.active ? "text-orange-500 opacity-50" : "text-base-300"}
+                          ${myStrategy && myStrategy?.isActive ? "text-orange-500 opacity-50" : "text-base-300"}
                           `}>&raquo;</div>
                           <div className={`
                           grid flex-grow card bg-base-300 rounded-box place-items-center shadow-md shadow-gray-100 border
-                          ${myStrategy && myStrategy?.active ? "bg-orange-50 border-orange-100" : "bg-base-300"}
+                          ${myStrategy && myStrategy?.isActive ? "bg-orange-50 border-orange-100" : "bg-base-300"}
                           `}>
                             <h3 className={"text-xl font-semibold mb-1 text-gray-700"}>{strategy.assetToTitle}</h3>
                             <small className={"text-xsm block opacity-80"}>{strategy.toAsset}</small>
@@ -244,7 +244,7 @@ const OneStrategy: NextPage = () => {
 
                             <div className={"flex flex-row gap-10 mt-5"}>
                               <div className={"flex-1 text-right"}>
-                                <p>Status: {myStrategy.active ? "active" : "not active"}</p>
+                                <p>Status: {myStrategy.isActive ? "active" : "not active"}</p>
                                 <p>Amount
                                   once: {formatUnits(myStrategy?.amountOnce, tokenDecimals[strategy.fromAsset])} {strategy.assetFromTitle}</p>
                               </div>

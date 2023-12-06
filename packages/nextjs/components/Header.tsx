@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import {useRouter} from "next/router";
+import {RainbowKitCustomConnectButton} from "~~/components/scaffold-eth";
 
 export const Header = () => {
   const router = useRouter();
@@ -61,11 +61,11 @@ export const Header = () => {
               Bridge
             </Link>
           </li>
-          <li className="nav-item">
-            <Link href={"/fDCA"} className={`nav-link ${router.pathname == "/fDCA" ? "active" : ""}`}>
-              fDCA
-            </Link>
-          </li>
+          {/*<li className="nav-item">*/}
+          {/*  <Link href={"/fDCA"} className={`nav-link ${router.pathname == "/fDCA" ? "active" : ""}`}>*/}
+          {/*    fDCA*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
           <li className="nav-item">
             <Link href={"/statistic"} className={`nav-link ${router.pathname == "/statistic" ? "active" : ""}`}>
               Statistic

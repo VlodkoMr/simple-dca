@@ -1,15 +1,15 @@
-import type { NextPage } from "next";
-import { MetaHeader } from "~~/components/MetaHeader";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import React, { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
-import { JoinStrategy } from "~~/components/modals/JoinStrategy";
-import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
-import { DepositStrategy } from "~~/components/modals/DepositStrategy";
-import { OneStrategy } from "~~/components/OneStrategy";
+import type {NextPage} from "next";
+import {MetaHeader} from "~~/components/MetaHeader";
+import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import React, {useEffect, useMemo, useState} from "react";
+import {useAccount} from "wagmi";
+import {JoinStrategy} from "~~/components/modals/JoinStrategy";
+import {useTokensDecimal} from "~~/hooks/useTokensDecimal";
+import {DepositStrategy} from "~~/components/modals/DepositStrategy";
+import {OneStrategy} from "~~/components/OneStrategy";
 
 const Strategies: NextPage = () => {
-  const { address } = useAccount();
+  const {address} = useAccount();
   const [onlyMyStrategies, setOnlyMyStrategies] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [joinStrategy, setJoinStrategy] = useState();
@@ -17,15 +17,15 @@ const Strategies: NextPage = () => {
   const [myStrategiesObj, setMyStrategiesObj] = useState({});
   const [searchText, setSearchText] = useState("");
 
-  const { data: allStrategies } = useScaffoldContractRead({
+  const {data: allStrategies} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
   });
 
-  const { tokenDecimals } = useTokensDecimal({ allStrategies });
+  const {tokenDecimals} = useTokensDecimal({allStrategies});
 
-  const { data: myStrategies } = useScaffoldContractRead({
+  const {data: myStrategies} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -55,7 +55,7 @@ const Strategies: NextPage = () => {
       strategies = strategies?.filter((strategy) => myStrategiesObj[strategy.id]);
     }
     if (onlyAvailable) {
-      strategies = strategies?.filter((strategy) => strategy.active);
+      strategies = strategies?.filter((strategy) => strategy.isActive);
     }
     if (searchText.length > 1) {
       let text = searchText.toLowerCase();

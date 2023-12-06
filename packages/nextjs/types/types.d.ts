@@ -1,7 +1,8 @@
 interface Strategy {
   id: number;
   title: string;
-  active: boolean;
+  isActive: boolean;
+  isBridge: boolean;
   assetFromTitle: string;
   assetToTitle: string;
   fromAsset: string;
@@ -11,6 +12,7 @@ interface Strategy {
   totalBalance: BigInt;
   usersLimit: number;
   balancerPoolId: string;
+  dataFeed: string;
 }
 
 interface UserStrategy {

@@ -6,622 +6,8 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   5: {
-    FlexDCA: {
-      address: "0x007EF72c5ED8Dfc58428EA732c275477C0c0EBcA",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_initialOwner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_balancerVault",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_feeCollector",
-              type: "address",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "target",
-              type: "address",
-            },
-          ],
-          name: "AddressEmptyCode",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "AddressInsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "FailedInnerCall",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-          ],
-          name: "OwnableInvalidOwner",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "OwnableUnauthorizedAccount",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "token",
-              type: "address",
-            },
-          ],
-          name: "SafeERC20FailedOperation",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "previousOwner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          stateMutability: "payable",
-          type: "fallback",
-        },
-        {
-          inputs: [],
-          name: "balancerVault",
-          outputs: [
-            {
-              internalType: "contract IVault",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "bytes",
-              name: "checkData",
-              type: "bytes",
-            },
-          ],
-          name: "checkUpkeep",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-            {
-              internalType: "bytes",
-              name: "",
-              type: "bytes",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "_strategyId",
-              type: "uint32",
-            },
-          ],
-          name: "claimTokens",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint32",
-              name: "_strategyId",
-              type: "uint32",
-            },
-          ],
-          name: "deposit",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "_strategyId",
-              type: "uint32",
-            },
-          ],
-          name: "exitStrategy",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "feeCollector",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getAllStrategies",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "string",
-                  name: "title",
-                  type: "string",
-                },
-                {
-                  internalType: "address",
-                  name: "fromAsset",
-                  type: "address",
-                },
-                {
-                  internalType: "address",
-                  name: "toAsset",
-                  type: "address",
-                },
-                {
-                  internalType: "bytes32",
-                  name: "balancerPoolId",
-                  type: "bytes32",
-                },
-                {
-                  internalType: "uint256",
-                  name: "totalAmountFromAsset",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "totalAmountToAsset",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint32",
-                  name: "usersLimit",
-                  type: "uint32",
-                },
-              ],
-              internalType: "struct FlexDCA.Strategy[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_user",
-              type: "address",
-            },
-          ],
-          name: "getAllUserStrategies",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "uint256",
-                  name: "amountLeft",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "amountOnce",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "claimAvailable",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "nextExecute",
-                  type: "uint256",
-                },
-                {
-                  internalType: "uint256",
-                  name: "executeRepeat",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "active",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct FlexDCA.UserStrategyDetails[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "_strategyId",
-              type: "uint32",
-            },
-            {
-              internalType: "uint256",
-              name: "_executeRepeat",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountOnce",
-              type: "uint256",
-            },
-          ],
-          name: "joinEditStrategy",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "_title",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_toAsset",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "_balancerPoolId",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint32",
-              name: "_usersLimit",
-              type: "uint32",
-            },
-          ],
-          name: "newStrategy",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "owner",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "bytes",
-              name: "_performData",
-              type: "bytes",
-            },
-          ],
-          name: "performUpkeep",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-          ],
-          name: "strategies",
-          outputs: [
-            {
-              internalType: "string",
-              name: "title",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "toAsset",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "balancerPoolId",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint256",
-              name: "totalAmountFromAsset",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "totalAmountToAsset",
-              type: "uint256",
-            },
-            {
-              internalType: "uint32",
-              name: "usersLimit",
-              type: "uint32",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "strategyUsers",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_toAsset",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "_balancerPoolId",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "swap",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalStrategies",
-          outputs: [
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "transferOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "userStrategies",
-          outputs: [
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "uint32",
-              name: "",
-              type: "uint32",
-            },
-          ],
-          name: "userStrategyDetails",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "amountLeft",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "amountOnce",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "claimAvailable",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "nextExecute",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "executeRepeat",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "active",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          stateMutability: "payable",
-          type: "receive",
-        },
-      ],
-      inheritedFunctions: {
-        checkUpkeep:
-          "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
-        performUpkeep:
-          "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol",
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
-    },
-  },
-  11155111: {
     Bridge: {
-      address: "0x8ff604d3811994e7fc399A1620092d3A3Aa25B09",
+      address: "0x36A2837861ce2AC9BF071Bc1c33Af13B80EDA6d5",
       abi: [
         {
           inputs: [
@@ -920,7 +306,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0xb226577F3e32a0f72C025992149a66fC1A916bAd",
+      address: "0x74fc6Ca691e0e4F62750FAC74173eD1aF0544E99",
       abi: [
         {
           inputs: [
@@ -1201,6 +587,11 @@ const deployedContracts = {
                   type: "bytes32",
                 },
                 {
+                  internalType: "address",
+                  name: "dataFeed",
+                  type: "address",
+                },
+                {
                   internalType: "uint256",
                   name: "totalBalance",
                   type: "uint256",
@@ -1343,6 +734,11 @@ const deployedContracts = {
                   type: "bytes32",
                 },
                 {
+                  internalType: "address",
+                  name: "dataFeed",
+                  type: "address",
+                },
+                {
                   internalType: "uint256",
                   name: "totalBalance",
                   type: "uint256",
@@ -1430,6 +826,11 @@ const deployedContracts = {
               internalType: "bytes32",
               name: "_balancerPoolId",
               type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "_dataFeed",
+              type: "address",
             },
             {
               internalType: "bool",
@@ -1546,35 +947,6 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
-              name: "_fromAsset",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_toAsset",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "uniswapSwap",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
               internalType: "uint32",
               name: "_strategyId",
               type: "uint32",
@@ -1586,6 +958,24 @@ const deployedContracts = {
             },
           ],
           name: "updateStrategyBridge",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+            {
+              internalType: "address",
+              name: "_dataFeed",
+              type: "address",
+            },
+          ],
+          name: "updateStrategyDataFeed",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",

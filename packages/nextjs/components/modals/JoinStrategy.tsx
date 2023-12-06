@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {useDeployedContractInfo, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
 import {BigNumber} from "@ethersproject/bignumber";
-import {erc20ABI, useAccount, useContractRead, useToken} from "wagmi";
+import {erc20ABI, useAccount, useBalance, useContractRead, useToken} from "wagmi";
 import {formatUnits, parseUnits} from "viem";
 import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 import {repeatOptions} from "~~/config/constants";
@@ -21,7 +21,7 @@ export const JoinStrategy = ({
 }: MetaHeaderProps) => {
   const account = useAccount();
   const [currentStep, setCurrentStep] = useState(1);
-  const [totalDeposit, setTotalDeposit] = useState(0);
+  const [totalDeposit, setTotalDeposit] = useState("");
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
   const [splitCount, setSplitCount] = useState(defaultSplitCount);
   const [repeat, setRepeat] = useState(defaultRepeat);
@@ -42,6 +42,12 @@ export const JoinStrategy = ({
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address,
   });
 
+  const {data: fromTokenBalance} = useBalance({
+    address: account?.address,
+    token: strategy?.fromAsset,
+    enabled: !!strategy?.fromAsset && !!account?.address,
+  });
+
   const amountOnce = useMemo(() => {
     if (totalDepositWei && splitCount) {
       return BigNumber.from(totalDepositWei).div(splitCount).toString();
@@ -59,7 +65,7 @@ export const JoinStrategy = ({
   useEffect(() => {
     if (strategy) {
       setCurrentStep(1);
-      setTotalDeposit(0);
+      setTotalDeposit("");
       setTotalDepositWei(BigInt(0));
       setSplitCount(defaultSplitCount);
       setRepeat(defaultRepeat);
@@ -70,7 +76,8 @@ export const JoinStrategy = ({
   const {writeAsync: joinStrategyWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
-    args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    args: [strategy?.id, BigNumber.from(repeat).mul(10).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    // args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
     enabled: !!strategy && !!amountOnce && repeat > 0,
     onError: (error) => {
       alert(error);
@@ -80,6 +87,14 @@ export const JoinStrategy = ({
     onBlockConfirmation: (txnReceipt) => {
       console.log(`joinStrategyWrite txnReceipt`, txnReceipt);
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+
+      if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
+        setCurrentStep(2);
+        writeApprove();
+      } else {
+        setCurrentStep(3);
+        depositWrite();
+      }
     },
     onSuccess: (tx) => {
       if (tx) {
@@ -129,22 +144,26 @@ export const JoinStrategy = ({
     }
   });
 
+  const setMaxAmount = () => {
+    console.log(`fromTokenBalance`, fromTokenBalance);
+    if (fromTokenBalance) {
+      setTotalDeposit(parseFloat(fromTokenBalance.formatted));
+    }
+  }
+
   const joinStrategy = async () => {
     if (!splitCount || !repeat || !totalDeposit) {
       alert("Please enter an amount and repeat period");
       return;
     }
 
+    if (fromTokenBalance && totalDepositWei > fromTokenBalance.value) {
+      alert("Insufficient balance");
+      return;
+    }
+
     setIsLoading(true);
-    joinStrategyWrite().then(() => {
-      if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
-        setCurrentStep(2);
-        writeApprove();
-      } else {
-        setCurrentStep(3);
-        depositWrite();
-      }
-    });
+    joinStrategyWrite();
   }
 
   return (
@@ -152,24 +171,30 @@ export const JoinStrategy = ({
       {strategy && (
         <div className="modal-box">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 outline-none pl-4 pr-7">✕</button>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 outline-none pl-4 pr-6">✕</button>
           </form>
           <h3 className="font-bold text-lg">Join {strategy.title} Strategy</h3>
 
           {!isLoading ? (
             <div className="pt-6 pb-2">
-              <div className={"flex flex-row gap-4 mb-3"}>
+              <div className={"flex flex-row gap-4 mb-3 relative"}>
                 <div className={"w-32 pt-3 text-right"}>Total deposit:</div>
                 <input
                   type="number"
                   min={1}
                   step={1}
+                  value={totalDeposit}
                   onChange={(e) => {
                     setTotalDeposit(parseFloat(e.target.value));
                   }}
-                  className="input input-bordered w-full font-normal max-w-xs focus:outline-none"
+                  className="input input-bordered w-full font-normal max-w-xs focus:outline-none pr-16"
                   placeholder={`Total ${strategy.assetFromTitle}`}
                 />
+                <div
+                  onClick={() => setMaxAmount()}
+                  className={"absolute z-10 right-4 top-3.5 text-sm text-blue-400 cursor-pointer hover:text-blue-500"}>
+                  MAX
+                </div>
               </div>
 
               <div className={"flex flex-row gap-4 mb-3"}>

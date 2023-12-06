@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./helpers/utils.sol";
 import "./interface/ISwapRouterUniswap.sol";
 import "./interface/IBridge.sol";
+import "./interface/IERC20Extended.sol";
 
 contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     using SafeERC20 for IERC20;
@@ -63,7 +64,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     }
 
     modifier strategyExists(uint32 _strategyId) {
-        if (strategies[_strategyId].balancerPoolId == bytes32(0)) {
+        if (strategies[_strategyId].id == 0) {
             revert("DCA#02: strategy does not exist");
         }
         _;
@@ -294,7 +295,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
 
         // Check returned amount using data feed
         if (strategy.dataFeed != address(0)) {
-            _checkReturnedSwapAmount(strategy, _returnAssetResult);
+            _checkReturnedSwapAmount(strategy, _totalSwap, _returnAssetResult);
         } else {
             // no data fees, basic check
             require(_returnAssetResult > 0, "DCA#06: swap failed, no result returned");
@@ -386,13 +387,12 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         );
     }
 
-    // TODO: fix public
     function uniswapSwap(
         address _fromAsset,
         address _toAsset,
         uint256 _amount
     )
-    public
+    private
     returns (uint256)
     {
         IERC20(_fromAsset).approve(address(uniswapSwapRouter), _amount);
@@ -484,16 +484,21 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         return _sDetails.isActive && _sDetails.nextExecute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
     }
 
-    function _checkReturnedSwapAmount(Strategy storage strategy, uint256 _returnAssetResult)
-    private
+    function _checkReturnedSwapAmount(Strategy storage strategy, uint256 _totalSwap, uint256 _returnAssetResult)
+    private view
     {
         AggregatorV3Interface _priceFeed = AggregatorV3Interface(strategy.dataFeed);
         (, int256 _lastPrice, , ,) = _priceFeed.latestRoundData();
 
-        // NOTE: scaled up by 10 ** 8;
-        // TODO: check if price is correct, include slippage
-        // TODO: revert on fail
-        // revert("DCA#16: wrong returned amount")
+        IERC20Extended _token = IERC20Extended(strategy.toAsset);
+        uint256 _decimals = _token.decimals();
+
+        // NOTE: chainlink price scaled up by 10 ** 8;
+        uint256 _expectedReturn = _totalSwap * uint256(_lastPrice) * 10 ** _decimals / 10 ** 8;
+        uint256 _slippage = _expectedReturn * 2 / 100; // 2%
+
+        uint256 _minReturn = _expectedReturn - _slippage;
+        require(_returnAssetResult >= _minReturn, "DCA#16: wrong returned amount");
     }
 
     // ---------------------- OnlyOwner ----------------------
