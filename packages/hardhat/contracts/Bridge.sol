@@ -16,7 +16,7 @@ contract Bridge is CCIPReceiver {
     string public latestMessage;
     string public chainSelector;
 
-    event MessageSent(uint messageId);
+    event MessageSent(bytes32 messageId);
 
     event MessageReceived(
         bytes32 latestMessageId,
