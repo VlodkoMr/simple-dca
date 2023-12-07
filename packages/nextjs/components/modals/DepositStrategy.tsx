@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useDeployedContractInfo, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
 import {BigNumber} from "@ethersproject/bignumber";
-import {erc20ABI, useAccount, useContractRead, useToken} from "wagmi";
+import {erc20ABI, useAccount, useContractRead, useNetwork, useToken} from "wagmi";
 import {parseUnits} from "viem";
 import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 
@@ -15,6 +15,7 @@ export const DepositStrategy = ({
   onUpdate
 }: MetaHeaderProps) => {
   const account = useAccount();
+  const {chain} = useNetwork();
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState(0);
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
@@ -23,6 +24,7 @@ export const DepositStrategy = ({
   const {data: fromToken} = useToken({
     address: strategy?.fromAsset,
     enabled: !!strategy?.fromAsset,
+    chainId: chain?.id,
   });
 
   const {data: flexDCAContract} = useDeployedContractInfo("FlexDCA");
@@ -30,9 +32,10 @@ export const DepositStrategy = ({
   const {data: tokenAllowance} = useContractRead({
     address: strategy?.fromAsset,
     abi: erc20ABI,
+    chainId: chain?.id,
     functionName: "allowance",
     args: [account?.address as string, flexDCAContract?.address as string],
-    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address,
+    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!chain?.id,
   });
 
   useEffect(() => {
@@ -56,10 +59,12 @@ export const DepositStrategy = ({
     functionName: "approve",
     abi: erc20ABI,
     args: [flexDCAContract?.address, Number(totalDepositWei)],
-    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei,
+    enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei && !!chain?.id,
     onBlockConfirmation: (txnReceipt) => {
-      console.log(`writeApprove txnReceipt`, txnReceipt);
-      depositWrite();
+      console.log(`txnReceipt`, txnReceipt);
+      depositWrite().then(() => {
+        console.log(`+`);
+      });
       setCurrentStep(2);
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },
@@ -67,7 +72,13 @@ export const DepositStrategy = ({
       alert(error);
       setIsLoading(false);
     },
+    onSuccess: (tx) => {
+      if (tx) {
+        console.log("Transaction sent: " + tx.hash);
+      }
+    }
   });
+
 
   const {writeAsync: depositWrite} = useScaffoldContractWrite({
     contractName: "FlexDCA",
@@ -100,10 +111,15 @@ export const DepositStrategy = ({
 
     setIsLoading(true);
     if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
-      writeApprove();
+      console.log(`writeApprove`);
+      writeApprove().then(() => {
+        console.log(`+1`);
+      });
     } else {
       setCurrentStep(2);
-      depositWrite();
+      depositWrite().then(() => {
+        console.log(`+2`);
+      });
     }
   }
 

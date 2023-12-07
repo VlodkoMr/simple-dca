@@ -5,6 +5,7 @@ import {erc20ABI, useAccount, useBalance, useContractRead, useToken} from "wagmi
 import {formatUnits, parseUnits} from "viem";
 import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 import {repeatOptions} from "~~/config/constants";
+import {getNetwork} from "@wagmi/core";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -20,6 +21,7 @@ export const JoinStrategy = ({
   onUpdate
 }: MetaHeaderProps) => {
   const account = useAccount();
+  const {chain} = getNetwork();
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState("");
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
@@ -37,6 +39,7 @@ export const JoinStrategy = ({
   const {data: tokenAllowance} = useContractRead({
     address: strategy?.fromAsset,
     abi: erc20ABI,
+    chainId: chain?.id,
     functionName: "allowance",
     args: [account?.address as string, flexDCAContract?.address as string],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address,
@@ -45,6 +48,7 @@ export const JoinStrategy = ({
   const {data: fromTokenBalance} = useBalance({
     address: account?.address,
     token: strategy?.fromAsset,
+    chainId: chain?.id,
     enabled: !!strategy?.fromAsset && !!account?.address,
   });
 
@@ -78,7 +82,7 @@ export const JoinStrategy = ({
     functionName: "joinEditStrategy",
     args: [strategy?.id, BigNumber.from(repeat).mul(10).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
     // args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
-    enabled: !!strategy && !!amountOnce && repeat > 0,
+    enabled: !!strategy && !!amountOnce && repeat > 0 && !!chain?.id,
     onError: (error) => {
       alert(error);
       setIsLoading(false);
@@ -90,10 +94,14 @@ export const JoinStrategy = ({
 
       if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
         setCurrentStep(2);
-        writeApprove();
+        writeApprove().then(() => {
+          console.log(`+`);
+        });
       } else {
         setCurrentStep(3);
-        depositWrite();
+        depositWrite().then(() => {
+          console.log(`+`);
+        });
       }
     },
     onSuccess: (tx) => {
@@ -112,7 +120,9 @@ export const JoinStrategy = ({
     onBlockConfirmation: (txnReceipt) => {
       console.log(`writeApprove txnReceipt`, txnReceipt);
       setCurrentStep(3);
-      depositWrite();
+      depositWrite().then(() => {
+        console.log(`+`);
+      });
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },
     onError: (error) => {
@@ -163,7 +173,9 @@ export const JoinStrategy = ({
     }
 
     setIsLoading(true);
-    joinStrategyWrite();
+    joinStrategyWrite().then(() => {
+      console.log(`+`);
+    });
   }
 
   return (

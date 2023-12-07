@@ -2,14 +2,16 @@ import type {NextPage} from "next";
 import {MetaHeader} from "~~/components/MetaHeader";
 import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
 import React, {useEffect, useMemo, useState} from "react";
-import {useAccount} from "wagmi";
+import {useAccount, useNetwork} from "wagmi";
 import {JoinStrategy} from "~~/components/modals/JoinStrategy";
 import {useTokensDecimal} from "~~/hooks/useTokensDecimal";
 import {DepositStrategy} from "~~/components/modals/DepositStrategy";
 import {OneStrategy} from "~~/components/OneStrategy";
+import {getNetwork} from "@wagmi/core";
 
 const Strategies: NextPage = () => {
   const {address} = useAccount();
+  const {chain} = useNetwork();
   const [onlyMyStrategies, setOnlyMyStrategies] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [joinStrategy, setJoinStrategy] = useState();
@@ -21,6 +23,7 @@ const Strategies: NextPage = () => {
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
+    chainId: chain?.id,
   });
 
   const {tokenDecimals} = useTokensDecimal({allStrategies});
@@ -30,6 +33,7 @@ const Strategies: NextPage = () => {
     functionName: "getAllUserStrategies",
     args: [address],
     cacheTime: 3_000,
+    chainId: chain?.id,
   });
 
   useEffect(() => {

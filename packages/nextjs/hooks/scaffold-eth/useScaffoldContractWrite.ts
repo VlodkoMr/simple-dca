@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Abi, ExtractAbiFunctionNames } from "abitype";
-import { useContractWrite, useNetwork } from "wagmi";
-import { getParsedError } from "~~/components/scaffold-eth";
-import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork, notification } from "~~/utils/scaffold-eth";
-import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
+import {useState} from "react";
+import {Abi, ExtractAbiFunctionNames} from "abitype";
+import {useContractWrite, useNetwork} from "wagmi";
+import {getParsedError} from "~~/components/scaffold-eth";
+import {useDeployedContractInfo, useTransactor} from "~~/hooks/scaffold-eth";
+import {getTargetNetwork, notification} from "~~/utils/scaffold-eth";
+import {ContractAbi, ContractName, UseScaffoldWriteConfig} from "~~/utils/scaffold-eth/contract";
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite<Abi, string, undefined>>["writeAsync"]>[0];
 
@@ -28,11 +28,11 @@ export const useScaffoldContractWrite = <
   blockConfirmations,
   ...writeConfig
 }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
-  const { data: deployedContractData } = useDeployedContractInfo(contractName);
-  const { chain } = useNetwork();
+  const {data: deployedContractData} = useDeployedContractInfo(contractName);
+  const {chain} = useNetwork();
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
-  const configuredNetwork = getTargetNetwork();
+  // const configuredNetwork = getTargetNetwork();
 
   const wagmiContractWrite = useContractWrite({
     address: deployedContractData?.address,
@@ -40,6 +40,7 @@ export const useScaffoldContractWrite = <
     functionName: functionName as any,
     args: args as unknown[],
     value: value,
+    chainId: chain?.id,
     ...writeConfig,
   });
 
@@ -59,10 +60,10 @@ export const useScaffoldContractWrite = <
       notification.error("Please connect your wallet");
       return;
     }
-    if (chain?.id !== configuredNetwork.id) {
-      notification.error("You are on the wrong network");
-      return;
-    }
+    // if (!chains.map(c => c.id)?.indexOf(chain?.id) === -1) {
+    //   notification.error("Chain not supported");
+    //   return;
+    // }
 
     if (wagmiContractWrite.writeAsync) {
       try {
@@ -74,7 +75,7 @@ export const useScaffoldContractWrite = <
               value: newValue ?? value,
               ...otherConfig,
             }),
-          { onBlockConfirmation, blockConfirmations },
+          {onBlockConfirmation, blockConfirmations},
         );
 
         return writeTxResult;

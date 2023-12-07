@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import {useRouter} from "next/router";
 import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {erc20ABI, useAccount, useContractReads} from "wagmi";
+import {erc20ABI, useAccount, useContractReads, useNetwork} from "wagmi";
 import {formatUnits} from "viem";
 import {repeatOptions} from "~~/config/constants";
 import {JoinStrategy} from "~~/components/modals/JoinStrategy";
@@ -14,19 +14,17 @@ const OneStrategy: NextPage = () => {
   const router = useRouter();
   const {id} = router.query;
   const {address} = useAccount();
-
-  console.log(`id`, id);
+  const {chain} = useNetwork();
 
   const {data: strategy} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getStrategy",
+    chainId: chain?.id,
     enabled: !!id,
     cacheOnBlock: true,
     watch: false,
     args: [id],
   });
-
-  console.log(`strategy`, strategy);
 
   const {data: tokenDecimals} = useContractReads({
     contracts: [
@@ -54,11 +52,10 @@ const OneStrategy: NextPage = () => {
     }
   });
 
-  console.log(`tokenDecimals`, tokenDecimals);
-
   const {data: myStrategy, refetch: refetchMyStrategy} = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
+    chainId: chain?.id,
     args: [address],
     enabled: !!id && !!address,
     watch: false,
@@ -68,8 +65,6 @@ const OneStrategy: NextPage = () => {
       }
     }
   });
-
-  console.log(`myStrategy`, myStrategy);
 
   const formatDate = (timestamp: number) => {
     return Intl.DateTimeFormat("en-US", {

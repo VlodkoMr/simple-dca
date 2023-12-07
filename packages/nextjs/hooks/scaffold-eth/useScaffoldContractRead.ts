@@ -1,13 +1,14 @@
-import type { ExtractAbiFunctionNames } from "abitype";
-import { useContractRead } from "wagmi";
-import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import type {ExtractAbiFunctionNames} from "abitype";
+import {useContractRead} from "wagmi";
+import {useDeployedContractInfo} from "~~/hooks/scaffold-eth";
+import {getTargetNetwork} from "~~/utils/scaffold-eth";
 import {
   AbiFunctionReturnType,
   ContractAbi,
   ContractName,
   UseScaffoldReadConfig,
 } from "~~/utils/scaffold-eth/contract";
+import {getNetwork} from "@wagmi/core";
 
 /**
  * @dev wrapper for wagmi's useContractRead hook which loads in deployed contract contract abi, address automatically
@@ -15,6 +16,7 @@ import {
  * @param config.contractName - deployed contract name
  * @param config.functionName - name of the function to be called
  * @param config.args - args to be passed to the function call
+ * @param config.chainId - chainId to be passed to the function call
  */
 export const useScaffoldContractRead = <
   TContractName extends ContractName,
@@ -23,18 +25,20 @@ export const useScaffoldContractRead = <
   contractName,
   functionName,
   args,
+  chainId,
   ...readConfig
 }: UseScaffoldReadConfig<TContractName, TFunctionName>) => {
-  const { data: deployedContract } = useDeployedContractInfo(contractName);
+  // const {chain} = getNetwork();
+  const {data: deployedContract} = useDeployedContractInfo(contractName, chainId);
 
   return useContractRead({
-    chainId: getTargetNetwork().id,
     functionName,
     address: deployedContract?.address,
     abi: deployedContract?.abi,
     watch: true,
     args,
-    enabled: !Array.isArray(args) || !args.some(arg => arg === undefined),
+    chainId: chainId,
+    enabled: !!chainId && (!Array.isArray(args) || !args.some(arg => arg === undefined)),
     ...(readConfig as any),
   }) as Omit<ReturnType<typeof useContractRead>, "data" | "refetch"> & {
     data: AbiFunctionReturnType<ContractAbi, TFunctionName> | undefined;
