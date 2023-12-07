@@ -161,10 +161,12 @@ const Bridge: NextPage = () => {
 
   const feeEstimateData = useMemo(() => {
     if (destinationStrategyId && bridgeAmountWei && address) {
-      return utils.solidityPack(["uint32", "uint256", "address"], [destinationStrategyId, bridgeAmountWei, address]).toString()
+      return utils.defaultAbiCoder.encode(["uint32", "uint256", "address"], [destinationStrategyId, bridgeAmountWei, address]).toString()
     }
     return "";
   }, [destinationStrategyId, bridgeAmountWei, address]);
+
+  console.log(`feeEstimateData`, feeEstimateData);
 
   const { data: bridgeMessageFee } = useScaffoldContractRead({
     contractName: "Bridge",
@@ -180,6 +182,13 @@ const Bridge: NextPage = () => {
     enabled: !!destinationChainId && !!destinationContract?.address && !!destinationStrategyId && !!bridgeAmountWei,
   });
 
+  const nativeFeeFormatted = useMemo(() => {
+    if (bridgeMessageFee && native) {
+      return parseFloat(formatUnits(bridgeMessageFee[1], native?.decimals));
+    }
+    return 0;
+  }, [bridgeMessageFee, native]);
+
   const { writeAsync: bridgeWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "bridgeTokens",
@@ -191,7 +200,7 @@ const Bridge: NextPage = () => {
       destinationStrategyId,
       bridgeAmountWei,
     ],
-    value: bridgeMessageFee ? formatEther(bridgeMessageFee[1], native?.decimals) : 0,
+    value: nativeFeeFormatted,
     enabled: !!destinationChainId && !!destinationContract?.address && !!bridgeAmount,
     onError: (error) => {
       alert(error);
@@ -312,7 +321,7 @@ const Bridge: NextPage = () => {
 
             {bridgeMessageFee && native && (
               <div className={"text-center mb-2 mt-2 opacity-60"}>
-                Bridge tx fee: {parseFloat(formatEther(bridgeMessageFee[1], native?.decimals)).toFixed(5)} {native?.symbol}
+                Bridge tx fee: {parseFloat(nativeFeeFormatted).toFixed(5)} {native?.symbol}
               </div>
             )}
 

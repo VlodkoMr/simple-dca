@@ -349,7 +349,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             _amount,
             msg.sender
         ));
-//        bridgeContract.bridgeTokens(_destinationChainSelector, _receiverContract, _data);
+        bridgeContract.bridgeTokens(_destinationChainSelector, _receiverContract, _data);
     }
 
     // ---------------------- Private ----------------------

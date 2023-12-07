@@ -13,15 +13,16 @@ contract Bridge is CCIPReceiver {
     address private immutable flexDCAContract;
     bool public immutable isTestnet;
     bytes32 public latestMessageId;
+    string public latestMessage;
     string public chainSelector;
 
-    event MessageSent(bytes32 messageId);
+    event MessageSent(uint messageId);
 
     event MessageReceived(
-        bytes32 latestMessageId
+        bytes32 latestMessageId,
 //        uint64 latestSourceChainSelector,
 //        address latestSender,
-//        string latestMessage
+        string latestMessage
     );
 
     modifier onlyFlexDCAContract() {
@@ -85,18 +86,7 @@ contract Bridge is CCIPReceiver {
             _receiverContract,
             _data
         );
-//        Client.EVM2AnyMessage memory _message = Client.EVM2AnyMessage({
-//            receiver: abi.encode(_receiverContract),
-//            data: abi.encode(_data),
-//            tokenAmounts: new Client.EVMTokenAmount[](0),
-//            extraArgs: "",
-//            feeToken: address(0)
-//        });
 
-//        uint256 _fee = IRouterClient(iRouter).getFee(
-//            _destinationChainSelector,
-//            _message
-//        );
         require(msg.value >= _fee, "Bridge#02: Not enough fees");
 
         bytes32 _messageId = IRouterClient(iRouter).ccipSend{value: _fee}(
@@ -114,13 +104,13 @@ contract Bridge is CCIPReceiver {
         latestMessageId = _message.messageId;
 //        latestSourceChainSelector = _message.sourceChainSelector;
 //        latestSender = abi.decode(_message.sender, (address));
-//        latestMessage = abi.decode(_message.data, (string));
+        latestMessage = abi.decode(_message.data, (string));
 //
         emit MessageReceived(
-            latestMessageId
+            latestMessageId,
 //            latestSourceChainSelector,
 //            latestSender,
-//            latestMessage
+            latestMessage
         );
     }
 

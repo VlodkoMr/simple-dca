@@ -621,7 +621,7 @@ const deployedContracts = {
   },
   80001: {
     Bridge: {
-      address: "0x4BF629d13A46c51de1296f819717D061fB11faBE",
+      address: "0x6F5aa8B05fBEF1B312130E8fA80286f632307fe8",
       abi: [
         {
           inputs: [
@@ -678,12 +678,37 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "bytes32",
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
               name: "messageId",
-              type: "bytes32",
+              type: "uint256",
             },
           ],
           name: "MessageSent",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "MessageTest",
           type: "event",
         },
         {
@@ -920,7 +945,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x83605E665875F2ed5D2f0b842052649b5E50436c",
+      address: "0xAcc5C1a3E0A0660278AB2b9CA02954bE83FBC61C",
       abi: [
         {
           inputs: [
