@@ -6,9 +6,9 @@
  * This script should run as the last deploy script.
  *  */
 
-import {DeployFunction} from "hardhat-deploy/types";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {network} from "hardhat";
+import { DeployFunction } from "hardhat-deploy/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { network } from "hardhat";
 
 /**
  * Generates the TypeScript contract definition file based on the json output of the contract deployment scripts
@@ -22,78 +22,68 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
 
 
   const pools: Record<string, any> = {
-    // sepolia: [
-    //   {
-    //     title: "Ethereum",
-    //     fromToken: "DAI",
-    //     toToken: "WETH",
-    //     from: "0x68194a729c2450ad26072b3d33adacbcef39d574",
-    //     to: "0x7b79995e5f793a07bc00c21412e50ecae098e7f9",
-    //     balancerPool: "0xe37b3fe430713ce615caa526d97b7c9e14b93c1a000200000000000000000016",
-    //     dataFeed: "0x0000000000000000000000000000000000000000",
-    //     bridge: true,
-    //   },
-    //   {
-    //     title: "Chainlink",
-    //     fromToken: "DAI",
-    //     toToken: "LINK",
-    //     from: "0x68194a729c2450ad26072b3d33adacbcef39d574",
-    //     to: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
-    //     balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
-    //     dataFeed: "0x0000000000000000000000000000000000000000",
-    //     bridge: true,
-    //   },
-    //   {
-    //     title: "Uniswap",
-    //     fromToken: "USDC",
-    //     toToken: "UNI",
-    //     from: "0x6f14c02fc1f78322cfd7d707ab90f18bad3b54f5",
-    //     to: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-    //     balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
-    //     dataFeed: "0x0000000000000000000000000000000000000000",
-    //     bridge: true,
-    //   },
-    // ],
-    goerli: [
-      {
-        title: "Bitcoin",
-        fromToken: "USDC",
-        toToken: "WBTC",
-        from: "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
-        to: "0x37f03a12241e9fd3658ad6777d289c3fb8512bc9",
-        balancerPool: "0x67f8fcb9d3c463da05de1392efdbb2a87f8599ea000200000000000000000059",
-        dataFeed: "0x0000000000000000000000000000000000000000",
-        bridge: false,
-      },
+    sepolia: [
       {
         title: "Ethereum",
-        fromToken: "USDC",
+        fromToken: "DAI",
         toToken: "WETH",
-        from: "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
-        to: "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
-        balancerPool: "0x9ee0af1ee0a0782daf5f1af47fd49b2a766bd8d40001000000000000000004b9",
+        from: "0x68194a729c2450ad26072b3d33adacbcef39d574",
+        to: "0x7b79995e5f793a07bc00c21412e50ecae098e7f9",
+        balancerPool: "0xe37b3fe430713ce615caa526d97b7c9e14b93c1a000200000000000000000016",
         dataFeed: "0x0000000000000000000000000000000000000000",
-        bridge: false,
+        bridge: true,
       },
       {
         title: "Chainlink",
-        fromToken: "USDC",
+        fromToken: "DAI",
         toToken: "LINK",
-        from: "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
-        to: "0x326c977e6efc84e512bb9c30f76e30c160ed06fb",
-        balancerPool: "0xf712f9abec5dd3cae089e73be5f24ce254128df000010000000000000000061e",
+        from: "0x68194a729c2450ad26072b3d33adacbcef39d574",
+        to: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+        balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
         dataFeed: "0x0000000000000000000000000000000000000000",
-        bridge: false,
+        bridge: true,
       },
       {
         title: "Uniswap",
         fromToken: "USDC",
         toToken: "UNI",
-        from: "0xe0C9275E44Ea80eF17579d33c55136b7DA269aEb",
+        from: "0x6f14c02fc1f78322cfd7d707ab90f18bad3b54f5",
         to: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
         balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
         dataFeed: "0x0000000000000000000000000000000000000000",
-        bridge: false,
+        bridge: true,
+      },
+    ],
+    polygonMumbai: [
+      {
+        title: "Ethereum",
+        fromToken: "USDC",
+        toToken: "WETH",
+        from: "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23",
+        to: "0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa",
+        balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        dataFeed: "0x0000000000000000000000000000000000000000",
+        bridge: true,
+      },
+      {
+        title: "Matic",
+        fromToken: "USDC",
+        toToken: "WMATIC",
+        from: "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23",
+        to: "0x9c3c9283d3e44854697cd22d3faa240cfb032889",
+        balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        dataFeed: "0x0000000000000000000000000000000000000000",
+        bridge: true,
+      },
+      {
+        title: "Chainlink",
+        fromToken: "USDC",
+        toToken: "LINK",
+        from: "0x0FA8781a83E46826621b3BC094Ea2A0212e71B23",
+        to: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+        balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        dataFeed: "0x0000000000000000000000000000000000000000",
+        bridge: true,
       },
     ],
     polygon: [

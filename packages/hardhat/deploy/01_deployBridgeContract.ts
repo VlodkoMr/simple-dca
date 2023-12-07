@@ -26,7 +26,7 @@ const deployBridge: DeployFunction = async function (hre: HardhatRuntimeEnvironm
 
   const chainLinkRouterCCIP: Record<string, string> = {
     sepolia: "0xd0daae2231e9cb96b94c8512223533293c3693bf",
-    goerli: "0x0000000000000000000000000000000000000000",
+    polygonMumbai: "0x70499c328e1e2a3c41108bd3730f6670a44595d1",
     polygon: "0x3C3D92629A02a8D95D5CB9650fe49C3544f69B43",
     polygonZkEvm: "0x0000000000000000000000000000000000000000",
     avalanche: "0x27F39D0af3303703750D4001fCc1844c6491563c",
@@ -34,7 +34,7 @@ const deployBridge: DeployFunction = async function (hre: HardhatRuntimeEnvironm
 
   const chainLinkChainSelector: Record<string, string> = {
     sepolia: "16015286601757825753",
-    goerli: "0",
+    polygonMumbai: "12532609583862916517",
     polygon: "4051577828743386545",
     polygonZkEvm: "0",
     avalanche: "6433500567565415381",
@@ -42,7 +42,7 @@ const deployBridge: DeployFunction = async function (hre: HardhatRuntimeEnvironm
 
   const isTestnet: Record<string, boolean> = {
     sepolia: true,
-    goerli: true,
+    polygonMumbai: true,
     polygon: false,
     polygonZkEvm: false,
     avalanche: false,

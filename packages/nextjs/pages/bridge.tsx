@@ -1,11 +1,12 @@
-import type {NextPage} from "next";
-import {MetaHeader} from "~~/components/MetaHeader";
-import React, {useEffect, useMemo, useState} from "react";
-import {getNetwork} from "@wagmi/core";
-import {useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {useTokensDecimal} from "~~/hooks/useTokensDecimal";
-import {useAccount, useBalance} from "wagmi";
-import {formatUnits, parseUnits} from "viem";
+import type { NextPage } from "next";
+import { MetaHeader } from "~~/components/MetaHeader";
+import React, { useEffect, useMemo, useState } from "react";
+import { getNetwork } from "@wagmi/core";
+import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
+import { useAccount, useBalance } from "wagmi";
+import { utils } from "ethers";
+import { formatEther, formatUnits, parseUnits } from "viem";
 
 const destinationChainSelectorMap = {
   11155111: "16015286601757825753", // sepolia
@@ -14,17 +15,17 @@ const destinationChainSelectorMap = {
   80001: "12532609583862916517", // mumbai
 }
 
-const DestinationSection = ({destinationChainId, setDestinationChainId, destinationStrategyId, setDestinationStrategyId}: {
-  destinationChainId: number | undefined;
+const DestinationSection = ({ destinationChainId, setDestinationChainId, destinationStrategyId, setDestinationStrategyId }: {
+  destinationChainId: number|undefined;
   setDestinationChainId: (destinationChainId: number) => void;
-  destinationStrategyId: number | undefined;
+  destinationStrategyId: number|undefined;
   setDestinationStrategyId: (destinationStrategyId: number) => void;
 }) => {
-  const {chain, chains} = getNetwork();
-  const {address} = useAccount();
+  const { chain, chains } = getNetwork();
+  const { address } = useAccount();
   const [myExtStrategiesObj, setMyExtStrategiesObj] = useState({});
 
-  const {data: allExtStrategies} = useScaffoldContractRead({
+  const { data: allExtStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
@@ -33,7 +34,7 @@ const DestinationSection = ({destinationChainId, setDestinationChainId, destinat
     enabled: !!destinationChainId
   });
 
-  const {data: myExtStrategies} = useScaffoldContractRead({
+  const { data: myExtStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -65,9 +66,13 @@ const DestinationSection = ({destinationChainId, setDestinationChainId, destinat
       <h5 className={"border-b-2 w-full text-center pb-2 mb-8"}>
         Destination chain:
         <span className={"text-orange-600 ml-2"}>
-          <select onChange={(e) => setDestinationChainId(parseInt(e.target.value))}
-                  value={destinationChainId}
-                  className="select select-sm select-bordered font-normal max-w-xs rounded-full focus:outline-none ">
+          <select
+            onChange={(e) => {
+              setDestinationChainId(parseInt(e.target.value));
+              setDestinationStrategyId();
+            }}
+            value={destinationChainId}
+            className="select select-sm select-bordered font-normal max-w-xs rounded-full focus:outline-none ">
             {chains.filter(c => c.id != chain?.id).map((chain) => (
               <option disabled={!destinationChainSelectorMap[chain.id]} key={chain.id} value={parseInt(chain.id)}>
                 {chain.name}
@@ -106,15 +111,22 @@ const DestinationSection = ({destinationChainId, setDestinationChainId, destinat
 }
 
 const Bridge: NextPage = () => {
-  const {chain} = getNetwork();
-  const {address} = useAccount();
+  const { chain } = getNetwork();
+  const { address } = useAccount();
   const [myStrategiesObj, setMyStrategiesObj] = useState({});
   const [bridgeAmount, setBridgeAmount] = useState();
   const [destinationChainId, setDestinationChainId] = useState();
   const [destinationStrategyId, setDestinationStrategyId] = useState();
   const [currentStrategyId, setCurrentStrategyId] = useState();
 
-  const {data: allStrategies} = useScaffoldContractRead({
+  const { data: native } = useBalance({
+    address: address,
+    chainId: chain?.id,
+  });
+
+  const { data: destinationContract } = useDeployedContractInfo("Bridge", destinationChainId);
+
+  const { data: allStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
@@ -122,9 +134,9 @@ const Bridge: NextPage = () => {
     chainId: chain?.id,
   });
 
-  const {tokenDecimals} = useTokensDecimal({allStrategies});
+  const { tokenDecimals } = useTokensDecimal({ allStrategies });
 
-  const {data: myStrategies} = useScaffoldContractRead({
+  const { data: myStrategies } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     args: [address],
@@ -133,10 +145,8 @@ const Bridge: NextPage = () => {
     chainId: chain?.id,
   });
 
-  const {data: destinationContract} = useDeployedContractInfo("Bridge", destinationChainId);
-
   const bridgeAmountWei = useMemo(() => {
-    if (bridgeAmount) {
+    if (bridgeAmount && allStrategies) {
       let fromAsset = '';
       allStrategies.map((strategy) => {
         if (parseInt(strategy.id) === currentStrategyId) {
@@ -147,25 +157,33 @@ const Bridge: NextPage = () => {
       return parseUnits(bridgeAmount.toString(), tokenDecimals[fromAsset]);
     }
     return 0;
-  }, [bridgeAmount, currentStrategyId]);
+  }, [bridgeAmount, currentStrategyId, allStrategies, tokenDecimals]);
 
-  console.log(`[
+  const feeEstimateData = useMemo(() => {
+    if (destinationStrategyId && bridgeAmountWei && address) {
+      return utils.solidityPack(["uint32", "uint256", "address"], [destinationStrategyId, bridgeAmountWei, address]).toString()
+    }
+    return "";
+  }, [destinationStrategyId, bridgeAmountWei, address]);
+
+  const { data: bridgeMessageFee } = useScaffoldContractRead({
+    contractName: "Bridge",
+    functionName: "getMessageWithFee",
+    args: [
       destinationChainSelectorMap[destinationChainId],
       destinationContract?.address,
-      currentStrategyId,
-      destinationStrategyId,
-      bridgeAmountWei,
-    ]`, [
-    destinationChainSelectorMap[destinationChainId],
-    destinationContract?.address,
-    currentStrategyId,
-    destinationStrategyId,
-    bridgeAmountWei,
-  ]);
+      feeEstimateData,
+    ],
+    cacheTime: 3_000,
+    watch: false,
+    chainId: chain?.id,
+    enabled: !!destinationChainId && !!destinationContract?.address && !!destinationStrategyId && !!bridgeAmountWei,
+  });
 
-  const {writeAsync: bridgeWrite} = useScaffoldContractWrite({
+  const { writeAsync: bridgeWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "bridgeTokens",
+    chainId: chain?.id,
     args: [
       destinationChainSelectorMap[destinationChainId],
       destinationContract?.address,
@@ -173,6 +191,7 @@ const Bridge: NextPage = () => {
       destinationStrategyId,
       bridgeAmountWei,
     ],
+    value: bridgeMessageFee ? formatEther(bridgeMessageFee[1], native?.decimals) : 0,
     enabled: !!destinationChainId && !!destinationContract?.address && !!bridgeAmount,
     onError: (error) => {
       alert(error);
@@ -190,7 +209,6 @@ const Bridge: NextPage = () => {
       }
     }
   });
-
 
   useEffect(() => {
     if (myStrategies) {
@@ -291,6 +309,12 @@ const Bridge: NextPage = () => {
                 />
               </div>
             </div>
+
+            {bridgeMessageFee && native && (
+              <div className={"text-center mb-2 mt-2 opacity-60"}>
+                Bridge tx fee: {parseFloat(formatEther(bridgeMessageFee[1], native?.decimals)).toFixed(5)} {native?.symbol}
+              </div>
+            )}
 
             <div className={"text-center mb-20"}>
               <button

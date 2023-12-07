@@ -52,18 +52,18 @@ script.
 yarn start
 ```
 
-### Deploy and Verify on Goerli:
-
-``` 
-yarn deploy --network goerli --reset
-yarn verify --network goerli
-```
-
 ### Deploy and Verify on Sepolia:
 
 ``` 
 yarn deploy --network sepolia --reset
 yarn verify --network sepolia
+```
+
+### Deploy and Verify on polygonMumbai:
+
+``` 
+yarn deploy --network polygonMumbai --reset
+yarn verify --network polygonMumbai
 ```
 
 ### Deploy and Verify on Polygon zkEVM:

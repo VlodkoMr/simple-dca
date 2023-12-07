@@ -32,8 +32,8 @@ contract Bridge is CCIPReceiver {
     }
 
     constructor(
-        address _router,
         address _flexDCAContract,
+        address _router,
         string memory _chainSelector,
         bool _isTestnet
     )
@@ -49,7 +49,7 @@ contract Bridge is CCIPReceiver {
 
     function getMessageWithFee(
         uint64 _destinationChainSelector,
-        address _receiver,
+        address _receiverContract,
         string memory _data
     )
     public view
@@ -57,7 +57,7 @@ contract Bridge is CCIPReceiver {
     (Client.EVM2AnyMessage memory, uint256)
     {
         Client.EVM2AnyMessage memory _message = Client.EVM2AnyMessage({
-            receiver: abi.encode(_receiver),
+            receiver: abi.encode(_receiverContract),
             data: abi.encode(_data),
             tokenAmounts: new Client.EVMTokenAmount[](0),
             extraArgs: "",
@@ -74,7 +74,7 @@ contract Bridge is CCIPReceiver {
 
     function bridgeTokens(
         uint64 _destinationChainSelector,
-        address _receiver,
+        address _receiverContract,
         string memory _data
     )
     external payable
@@ -82,11 +82,11 @@ contract Bridge is CCIPReceiver {
     {
         (Client.EVM2AnyMessage memory _message, uint256 _fee) = getMessageWithFee(
             _destinationChainSelector,
-            _receiver,
+            _receiverContract,
             _data
         );
 //        Client.EVM2AnyMessage memory _message = Client.EVM2AnyMessage({
-//            receiver: abi.encode(_receiver),
+//            receiver: abi.encode(_receiverContract),
 //            data: abi.encode(_data),
 //            tokenAmounts: new Client.EVMTokenAmount[](0),
 //            extraArgs: "",

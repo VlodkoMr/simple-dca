@@ -24,26 +24,14 @@ if (theme.fonts.font_family.secondary) {
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./pages/**/*.tsx",
-    "./pages/*.tsx",
-    "./components/**/*.tsx",
-    "./components/*.tsx",
-  ],
+  content: ["./pages/**/*.tsx", "./pages/*.tsx", "./components/**/*.tsx", "./components/*.tsx",],
   safelist: [{pattern: /^swiper-/}],
   theme: {
     screens: {
-      sm: "540px",
-      md: "768px",
-      lg: "1024px",
-      xl: "1280px",
-      "2xl": "1536px",
-    },
-    container: {
-      center: true,
-      padding: "2rem",
-    },
-    extend: {
+      sm: "540px", md: "768px", lg: "1024px", xl: "1280px", "2xl": "1536px",
+    }, container: {
+      center: true, padding: "2rem",
+    }, extend: {
       colors: {
         text: theme.colors.default.text_color.default,
         light: theme.colors.default.text_color.light,
@@ -53,9 +41,7 @@ module.exports = {
         body: theme.colors.default.theme_color.body,
         border: theme.colors.default.theme_color.border,
         "theme-light": theme.colors.default.theme_color.theme_light,
-        "theme-dark": theme.colors.default.theme_color.theme_dark,
-      },
-      fontSize: {
+      }, fontSize: {
         base: font_base + "px",
         h1: h1 + "rem",
         "h1-sm": h1 * 0.8 + "rem",
@@ -66,27 +52,15 @@ module.exports = {
         h4: h4 + "rem",
         h5: h5 + "rem",
         h6: h6 + "rem",
-      },
-      fontFamily: {
-        primary: [fontPrimary, fontPrimaryType],
-        secondary: [fontSecondary, fontSecondaryType],
+      }, fontFamily: {
+        primary: [fontPrimary, fontPrimaryType], secondary: [fontSecondary, fontSecondaryType],
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-    // require("@tailwindcss/forms"),
-    require("daisyui"),
-    require("tailwind-bootstrap-grid")({
-      generateContainer: false,
-      gridGutterWidth: "2rem",
-      gridGutters: {
-        1: "0.25rem",
-        2: "0.5rem",
-        3: "1rem",
-        4: "1.5rem",
-        5: "3rem",
+  plugins: [require("@tailwindcss/typography"), // require("@tailwindcss/forms"),
+    require("daisyui"), require("tailwind-bootstrap-grid")({
+      generateContainer: false, gridGutterWidth: "2rem", gridGutters: {
+        1: "0.25rem", 2: "0.5rem", 3: "1rem", 4: "1.5rem", 5: "3rem",
       },
-    }),
-  ],
+    }),],
 };

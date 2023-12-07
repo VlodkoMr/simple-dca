@@ -1,4 +1,4 @@
-import {connectorsForWallets} from "@rainbow-me/rainbowkit";
+import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
   braveWallet,
   coinbaseWallet,
@@ -9,17 +9,17 @@ import {
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import * as chains from "viem/chains";
-import {configureChains} from "wagmi";
-import {alchemyProvider} from "wagmi/providers/alchemy";
-import {publicProvider} from "wagmi/providers/public";
+import { configureChains } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 import scaffoldConfig from "~~/scaffold.config";
-import {burnerWalletConfig} from "~~/services/web3/wagmi-burner/burnerWalletConfig";
-import {getTargetNetwork} from "~~/utils/scaffold-eth";
+import { burnerWalletConfig } from "~~/services/web3/wagmi-burner/burnerWalletConfig";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const configuredNetwork = getTargetNetwork();
-const {onlyLocalBurnerWallet} = scaffoldConfig;
+const { onlyLocalBurnerWallet } = scaffoldConfig;
 
-const defaultChains = [chains.goerli, chains.sepolia, chains.polygon, chains.avalanche, {
+const defaultChains = [chains.polygonMumbai, chains.sepolia, chains.polygon, chains.avalanche, {
   ...chains.polygonZkEvm,
   iconUrl: 'https://assets-global.website-files.com/6364e65656ab107e465325d2/642235057dbc06788f6c45c1_polygon-zkevm-logo.png',
 }];
@@ -50,18 +50,18 @@ export const appChains = configureChains(
   },
 );
 
-const walletsOptions = {chains: appChains.chains, projectId: scaffoldConfig.walletConnectProjectId};
+const walletsOptions = { chains: appChains.chains, projectId: scaffoldConfig.walletConnectProjectId };
 const wallets = [
-  metaMaskWallet({...walletsOptions, shimDisconnect: true}),
+  metaMaskWallet({ ...walletsOptions, shimDisconnect: true }),
   walletConnectWallet(walletsOptions),
   ledgerWallet(walletsOptions),
   braveWallet(walletsOptions),
-  coinbaseWallet({...walletsOptions, appName: "scaffold-eth-2"}),
+  coinbaseWallet({ ...walletsOptions, appName: "scaffold-eth-2" }),
   rainbowWallet(walletsOptions),
   ...(configuredNetwork.id === chains.hardhat.id || !onlyLocalBurnerWallet
-    ? [burnerWalletConfig({chains: [appChains.chains[0]]})]
+    ? [burnerWalletConfig({ chains: [appChains.chains[0]] })]
     : []),
-  safeWallet({...walletsOptions, debug: false, allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/]}),
+  safeWallet({ ...walletsOptions, debug: false, allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/] }),
 ];
 
 /**
