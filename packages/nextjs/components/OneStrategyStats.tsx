@@ -41,7 +41,12 @@ export const OneStrategyStats = (
       } {strategy.assetToTitle}</b>
       </div>
 
-      <div>avg price</div>
+      {strategy.totalAmountToAsset > 0 && (
+        <div>Average price:
+          <b>{parseFloat(formatUnits(strategy.totalAmountFromAsset / strategy.totalAmountToAsset, tokenDecimals[strategy.fromAsset])).toFixed(4)}</b>
+        </div>
+      )}
+
 
     </div>
   );

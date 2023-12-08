@@ -326,30 +326,30 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     strategyExists(_strategyId)
     userStrategyExists(_strategyId)
     {
-        require(_destStrategyId > 0, "DCA#07: destStrategyId is wrong");
-        require(_destinationChainSelector > 0, "DCA#08: destinationChainSelector is wrong");
-        require(strategies[_strategyId].isBridge, "DCA#09: strategy bridge is not available");
-        require(_receiverContract != address(0), "DCA#10: receiverContract is zero address");
-        require(_amount > 0, "DCA#11: amount must be greater than 0");
-        require(msg.value > 0, "DCA#12: Wrong fees");
-
-        UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
-        Strategy storage strategy = strategies[_strategyId];
-
-        require(userStrategyDetail.amountLeft <= _amount, "DCA#13: amount exceeds balance");
-        userStrategyDetail.amountLeft -= _amount;
-        strategy.totalBalance -= _amount;
-
-        string memory _data = string(abi.encodePacked(
-            _destStrategyId,
-            _amount,
-            msg.sender
-        ));
-        bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data);
+//        require(_destStrategyId > 0, "DCA#07: destStrategyId is wrong");
+//        require(_destinationChainSelector > 0, "DCA#08: destinationChainSelector is wrong");
+//        require(strategies[_strategyId].isBridge, "DCA#09: strategy bridge is not available");
+//        require(_receiverContract != address(0), "DCA#10: receiverContract is zero address");
+//        require(_amount > 0, "DCA#11: amount must be greater than 0");
+//        require(msg.value > 0, "DCA#12: Wrong fees");
+//
+//        UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
+//        Strategy storage strategy = strategies[_strategyId];
+//
+//        require(userStrategyDetail.amountLeft <= _amount, "DCA#13: amount exceeds balance");
+//        userStrategyDetail.amountLeft -= _amount;
+//        strategy.totalBalance -= _amount;
+//
+//        string memory _data = string(abi.encodePacked(
+//            _destStrategyId,
+//            _amount,
+//            msg.sender
+//        ));
+//        bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data);
     }
 
     // token deposited from bridge
-    function bridgeDeposit(uint256 _amount, uint32 _strategyId, address _owner)
+    function addBridgedDeposit(uint256 _amount, uint32 _strategyId, address _owner)
     external
     strategyExists(_strategyId)
     {

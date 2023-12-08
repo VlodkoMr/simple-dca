@@ -621,7 +621,7 @@ const deployedContracts = {
   },
   80001: {
     Bridge: {
-      address: "0xfb339Cf132C14Da36D1F1B1f704174F8a4caF6E9",
+      address: "0x088de01062b45BF31aE0F3a9bcb7E4aE54d0713c",
       abi: [
         {
           inputs: [
@@ -920,7 +920,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x862032733d458306eCd41FdA5731651Ef999eF3F",
+      address: "0x618698279462139273D898D5767619E9e21687dE",
       abi: [
         {
           inputs: [
@@ -1028,19 +1028,6 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [],
-          name: "bridgeContract",
-          outputs: [
-            {
-              internalType: "contract IBridge",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "uint256",
@@ -1058,9 +1045,22 @@ const deployedContracts = {
               type: "address",
             },
           ],
-          name: "bridgeDeposit",
+          name: "addBridgedDeposit",
           outputs: [],
           stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "bridgeContract",
+          outputs: [
+            {
+              internalType: "contract IBridge",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {

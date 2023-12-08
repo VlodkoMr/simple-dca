@@ -185,8 +185,7 @@ const Bridge: NextPage = () => {
 
   const nativeFeeFormatted = useMemo(() => {
     if (bridgeMessageFee && native) {
-      const amount = parseFloat(formatUnits(bridgeMessageFee[1], native?.decimals));
-      return amount + amount * 0.01;
+      return parseFloat(formatUnits(bridgeMessageFee[1], native?.decimals));
     }
     return 0;
   }, [bridgeMessageFee, native]);

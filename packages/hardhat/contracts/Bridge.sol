@@ -112,7 +112,7 @@ contract Bridge is CCIPReceiver {
 //            latestMessage
         );
 
-        IFlexDCA(flexDCAContract).bridgeDeposit(
+        IFlexDCA(flexDCAContract).addBridgedDeposit(
             _amount,
             _strategyId,
             _owner
