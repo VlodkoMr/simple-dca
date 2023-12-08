@@ -18,7 +18,7 @@ const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
         chains={appChains.chains}
         avatar={BlockieAvatar}
         theme={lightTheme()}>
-        <div data-theme={"light"} className="flex flex-col h-screen justify-between">
+        <div data-theme={"light"} className="flex flex-col bg-gray-50 min-h-screen justify-between">
           <Header />
 
           <div className={"mb-auto"}>

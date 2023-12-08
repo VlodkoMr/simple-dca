@@ -34,7 +34,7 @@ export const RainbowKitCustomConnectButton = () => {
 
               if (chain.unsupported) {
                 return (
-                  <button className={"btn btn-white"} onClick={openChainModal} type="button">
+                  <button className={"btn btn-white bg-red-200"} onClick={openChainModal} type="button">
                     Wrong network
                   </button>
                 );

@@ -16,6 +16,7 @@ contract Bridge is CCIPReceiver {
     string public latestMessage;
     string public chainSelector;
 
+    event MessageTest(uint, uint);
     event MessageSent(bytes32 messageId);
 
     event MessageReceived(
@@ -86,6 +87,9 @@ contract Bridge is CCIPReceiver {
             _receiverContract,
             _data
         );
+
+        emit MessageTest(1, msg.value);
+        emit MessageTest(1, _fee);
 
         require(msg.value >= _fee, "Bridge#02: Not enough fees");
 

@@ -621,7 +621,7 @@ const deployedContracts = {
   },
   80001: {
     Bridge: {
-      address: "0x6F5aa8B05fBEF1B312130E8fA80286f632307fe8",
+      address: "0xab350E8FD375D72F405Bd3Ac14595Fc1b730ccec",
       abi: [
         {
           inputs: [
@@ -669,6 +669,12 @@ const deployedContracts = {
               name: "latestMessageId",
               type: "bytes32",
             },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "latestMessage",
+              type: "string",
+            },
           ],
           name: "MessageReceived",
           type: "event",
@@ -678,15 +684,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
+              internalType: "bytes32",
               name: "messageId",
-              type: "uint256",
+              type: "bytes32",
             },
           ],
           name: "MessageSent",
@@ -703,9 +703,9 @@ const deployedContracts = {
             },
             {
               indexed: false,
-              internalType: "string",
+              internalType: "uint256",
               name: "",
-              type: "string",
+              type: "uint256",
             },
           ],
           name: "MessageTest",
@@ -900,6 +900,19 @@ const deployedContracts = {
         },
         {
           inputs: [],
+          name: "latestMessage",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
           name: "latestMessageId",
           outputs: [
             {
@@ -945,7 +958,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0xAcc5C1a3E0A0660278AB2b9CA02954bE83FBC61C",
+      address: "0xd6E6f17C84e4EaF404fAD99C2972FD510Dde543a",
       abi: [
         {
           inputs: [
@@ -1729,18 +1742,18 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0x07F313AEc30249f25c6d2ca822f7DdC6f4441e05",
+      address: "0xF03ABFbC4c220bE02A38965ADAca10c0Ae187889",
       abi: [
         {
           inputs: [
             {
               internalType: "address",
-              name: "_router",
+              name: "_flexDCAContract",
               type: "address",
             },
             {
               internalType: "address",
-              name: "_flexDCAContract",
+              name: "_router",
               type: "address",
             },
             {
@@ -1777,6 +1790,12 @@ const deployedContracts = {
               name: "latestMessageId",
               type: "bytes32",
             },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "latestMessage",
+              type: "string",
+            },
           ],
           name: "MessageReceived",
           type: "event",
@@ -1803,7 +1822,7 @@ const deployedContracts = {
             },
             {
               internalType: "address",
-              name: "_receiver",
+              name: "_receiverContract",
               type: "address",
             },
             {
@@ -1891,7 +1910,7 @@ const deployedContracts = {
             },
             {
               internalType: "address",
-              name: "_receiver",
+              name: "_receiverContract",
               type: "address",
             },
             {
@@ -1983,6 +2002,19 @@ const deployedContracts = {
         },
         {
           inputs: [],
+          name: "latestMessage",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
           name: "latestMessageId",
           outputs: [
             {
@@ -2028,7 +2060,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x8566Ff55207ae5Be4cF065712EBC7617F7e4133b",
+      address: "0x3ecFA9c1B27dE200fa3bf4da20BC776382505bD2",
       abi: [
         {
           inputs: [

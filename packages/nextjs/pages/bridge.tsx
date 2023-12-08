@@ -176,8 +176,7 @@ const Bridge: NextPage = () => {
       destinationContract?.address,
       feeEstimateData,
     ],
-    cacheTime: 3_000,
-    watch: false,
+    watch: true,
     chainId: chain?.id,
     enabled: !!destinationChainId && !!destinationContract?.address && !!destinationStrategyId && !!bridgeAmountWei,
   });
