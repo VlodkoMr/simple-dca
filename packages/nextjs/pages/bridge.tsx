@@ -8,6 +8,7 @@ import { useAccount, useBalance } from "wagmi";
 import { utils } from "ethers";
 import { formatEther, formatUnits, parseUnits } from "viem";
 import { useSearchParams } from "next/navigation";
+import { BigNumber } from "@ethersproject/bignumber";
 
 const destinationChainSelectorMap = {
   11155111: BigInt("16015286601757825753"), // sepolia
@@ -195,7 +196,7 @@ const Bridge: NextPage = () => {
     functionName: "bridgeTokens",
     chainId: chain?.id,
     args: [
-      destinationChainSelectorMap[destinationChainId],
+      destinationChainSelectorMap[destinationChainId] || 0,
       destinationContract?.address,
       currentStrategyId,
       destinationStrategyId,
@@ -205,15 +206,12 @@ const Bridge: NextPage = () => {
     enabled: !!destinationChainId && !!destinationContract?.address && !!bridgeAmount,
     onError: (error) => {
       alert(error);
-      setIsMenuLoading(false);
     },
     onBlockConfirmation: (txnReceipt) => {
       console.log(`depositWrite txnReceipt`, txnReceipt);
-      setIsMenuLoading(false);
       // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     },
     onSuccess: (tx) => {
-      setIsMenuLoading(true);
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
@@ -243,6 +241,11 @@ const Bridge: NextPage = () => {
     const maxAmount = formatUnits(myStrategiesObj[currentStrategyId].amountLeft, tokenDecimals[fromAsset]);
     if (parseFloat(bridgeAmount) > parseFloat(maxAmount)) {
       alert(`You can only bridge ${maxAmount} ${fromAssetTitle} from this strategy.`);
+      return;
+    }
+
+    if (parseFloat(native.formatted) < parseFloat(nativeFeeFormatted)) {
+      alert(`You need at least ${nativeFeeFormatted.toFixed(5)} ${native?.symbol} for bridge.`);
       return;
     }
 
