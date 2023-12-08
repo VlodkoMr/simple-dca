@@ -3952,7 +3952,7 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0xF6527FAdeb315490CCFc3E887A1c70703F72a848",
+      address: "0xd701f1F79910161A35dA1a3cF7637356e2ef624B",
       abi: [
         {
           inputs: [
@@ -4276,7 +4276,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0xcb44d4e7F06Ab7B7E3388a658627C0caB4A9944c",
+      address: "0xf68aEe169299ea49d5B81025644102418501e153",
       abi: [
         {
           inputs: [
@@ -4370,6 +4370,88 @@ const deployedContracts = {
             {
               indexed: true,
               internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint32",
+              name: "strategyId",
+              type: "uint32",
+            },
+          ],
+          name: "ClaimedStrategy",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint32",
+              name: "strategyId",
+              type: "uint32",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+          ],
+          name: "Deposit",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint32",
+              name: "strategyId",
+              type: "uint32",
+            },
+          ],
+          name: "ExitedStrategy",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint32",
+              name: "strategyId",
+              type: "uint32",
+            },
+          ],
+          name: "JoinedStrategy",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
               name: "previousOwner",
               type: "address",
             },
@@ -4381,25 +4463,6 @@ const deployedContracts = {
             },
           ],
           name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "TestEvent",
           type: "event",
         },
         {

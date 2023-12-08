@@ -71,7 +71,7 @@ const DestinationSection = ({ destinationChainId, setDestinationChainId, destina
           <select
             onChange={(e) => {
               setDestinationChainId(parseInt(e.target.value));
-              setDestinationStrategyId();
+              setDestinationStrategyId(0);
             }}
             value={destinationChainId}
             className="select select-sm select-bordered font-normal max-w-xs rounded-full focus:outline-none ">
@@ -94,7 +94,7 @@ const DestinationSection = ({ destinationChainId, setDestinationChainId, destina
               <select onChange={(e) => setDestinationStrategyId(parseInt(e.target.value))}
                       value={destinationStrategyId}
                       className="select select-sm w-full select-bordered font-normal max-w-xs rounded-full focus:outline-none">
-                <option disabled selected>Please select a strategy</option>
+                <option value={0}>Please select a strategy</option>
                 {allExtStrategies.filter(strategy => myExtStrategiesObj[strategy.id]).map((strategy) => (
                   <option value={strategy.id}>{strategy.title}</option>
                 ))}
@@ -121,7 +121,7 @@ const Bridge: NextPage = () => {
   const [myStrategiesObj, setMyStrategiesObj] = useState({});
   const [bridgeAmount, setBridgeAmount] = useState();
   const [destinationChainId, setDestinationChainId] = useState();
-  const [destinationStrategyId, setDestinationStrategyId] = useState();
+  const [destinationStrategyId, setDestinationStrategyId] = useState(0);
   const [currentStrategyId, setCurrentStrategyId] = useState(selectedId);
 
   const { data: native } = useBalance({
@@ -171,7 +171,7 @@ const Bridge: NextPage = () => {
     return "";
   }, [destinationStrategyId, bridgeAmountWei, address]);
 
-  const { data: bridgeMessageFee } = useScaffoldContractRead({
+  const { data: bridgeMessageFee, status: messageFeeStatus } = useScaffoldContractRead({
     contractName: "Bridge",
     functionName: "getMessageWithFee",
     args: [
@@ -205,7 +205,7 @@ const Bridge: NextPage = () => {
     value: nativeFeeFormatted,
     enabled: !!destinationChainId && !!destinationContract?.address && !!bridgeAmount,
     onError: (error) => {
-      alert(error);
+      console.error(`error`, error);
     },
     onBlockConfirmation: (txnReceipt) => {
       console.log(`depositWrite txnReceipt`, txnReceipt);
@@ -323,15 +323,24 @@ const Bridge: NextPage = () => {
               </div>
             </div>
 
-            {bridgeMessageFee && native && (
-              <div className={"text-center mb-2 mt-2 opacity-60"}>
-                Bridge fee: {parseFloat(nativeFeeFormatted).toFixed(5)} {native?.symbol}
+            {messageFeeStatus === 'error' ? (
+              <div className={"text-center mb-2 mt-2 opacity-80 text-red-400"}>
+                Error: bridge on this direction unavailable.
               </div>
+            ) : (
+              <>
+                {bridgeMessageFee && native && (
+                  <div className={"text-center mb-2 mt-2 opacity-60"}>
+                    Bridge fee: {parseFloat(nativeFeeFormatted).toFixed(5)} {native?.symbol}
+                  </div>
+                )}
+              </>
             )}
+
 
             <div className={"text-center mb-20"}>
               <button
-                disabled={bridgeAmount == 0 || !destinationStrategyId || !currentStrategyId}
+                disabled={bridgeAmount == 0 || !destinationStrategyId || !currentStrategyId || messageFeeStatus === 'error'}
                 onClick={() => handleBridge()}
                 className={"btn bg-orange-200 border-orange-300 rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"}>
                 Bridge Tokens
