@@ -13,20 +13,10 @@ contract Bridge is CCIPReceiver {
     address private immutable flexDCAContract;
     bool public immutable isTestnet;
     bytes32 public latestMessageId;
-//    string public latestMessage;
     string public chainSelector;
 
     event MessageSent(bytes32 messageId);
-
-    event TestEvent(string, uint256, uint256);
-
-
-    event MessageReceived(
-        bytes32 latestMessageId
-//        uint64 latestSourceChainSelector,
-//        address latestSender,
-//        string latestMessage
-    );
+    event MessageReceived(bytes32 latestMessageId);
 
     modifier onlyFlexDCAContract() {
         if (msg.sender != flexDCAContract) {
