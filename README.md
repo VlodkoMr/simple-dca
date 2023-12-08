@@ -73,6 +73,13 @@ yarn deploy --network polygonZkEvm --reset
 yarn verify --network polygonZkEvm
 ```
 
+### Deploy and Verify on Polygon:
+
+``` 
+yarn deploy --network polygon --reset
+yarn verify --network polygon
+```
+
 ### Deploy and Verify on Avalanche:
 
 ``` 

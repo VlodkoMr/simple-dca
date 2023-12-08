@@ -28,7 +28,7 @@ const deployFlexDCA: DeployFunction = async function (hre: HardhatRuntimeEnviron
     sepolia: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
     polygonMumbai: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
     polygon: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
-    polygonZkEvm: "",
+    polygonZkEvm: "0x0000000000000000000000000000000000000000",
     avalanche: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   }
 

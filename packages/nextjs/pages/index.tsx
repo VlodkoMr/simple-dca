@@ -90,7 +90,7 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          {allStrategies && (
+          {allStrategies && tokenDecimals && (
             <div className="mt-10 flex flex-row w-full gap-8">
               {allStrategies.map(strategy => (
                 <Link href={`/strategies/${strategy.id}`}

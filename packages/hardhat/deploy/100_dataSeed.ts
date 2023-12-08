@@ -102,7 +102,7 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
         fromToken: "USDC.e",
         toToken: "WETH",
         from: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-        to: "0x0000000000000000000000000000000000000000",
+        to: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
         balancerPool: "0x03cd191f589d12b0582a99808cf19851e468e6b500010000000000000000000a",
         dataFeed: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
         bridge: true,
@@ -142,9 +142,9 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
       {
         title: "Ethereum",
         fromToken: "USDC",
-        toToken: "ETH",
+        toToken: "WETH",
         from: "0xa8ce8aee21bc2a48a5ef670afcc9274c7bbbc035",
-        to: "0x0000000000000000000000000000000000000000",
+        to: "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9",
         balancerPool: "0xc951aebfa361e9d0063355b9e68f5fa4599aa3d1000100000000000000000017",
         dataFeed: "0x0000000000000000000000000000000000000000",
         bridge: true,
@@ -241,21 +241,11 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
         dataFeed: "0x3F968A21647d7ca81Fb8A5b69c0A452701d5DCe8",
         bridge: true,
       },
-      {
-        title: "SushiSwap",
-        fromToken: "USDT",
-        toToken: "SUSHI",
-        from: "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
-        to: "0x39cf1bd5f15fb22ec3d9ff86b0727afc203427cc",
-        balancerPool: "0x0000000000000000000000000000000000000000000000000000000000000000",
-        dataFeed: "0x449A373A090d8A1e5F74c63Ef831Ceff39E94563",
-        bridge: true,
-      },
     ],
   };
 
   // set bridgeContract address
-  await flexDCAContract.setBridgeAddress(bridgeContract.address);
+  // await flexDCAContract.setBridgeAddress(bridgeContract.address);
 
   // add strategies
   const usersInStrategy = 1000;
