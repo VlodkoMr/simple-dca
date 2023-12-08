@@ -7,6 +7,7 @@ import { JoinStrategy } from "~~/components/modals/JoinStrategy";
 import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
 import { DepositStrategy } from "~~/components/modals/DepositStrategy";
 import { OneStrategy } from "~~/components/OneStrategy";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const Strategies: NextPage = () => {
   const { address } = useAccount();
@@ -22,7 +23,7 @@ const Strategies: NextPage = () => {
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
-    chainId: chain?.id,
+    chainId: chain?.id || getTargetNetwork().id,
   });
 
   const { tokenDecimals } = useTokensDecimal({ allStrategies });
@@ -129,7 +130,7 @@ const Strategies: NextPage = () => {
         </div>
 
 
-        {tokenDecimals && Object.keys(tokenDecimals).length > 0 && myStrategies ? (
+        {tokenDecimals && Object.keys(tokenDecimals).length > 0 ? (
           <div className={"mb-24"}>
             {allStrategiesFiltered?.map((strategy, index) => (
               <OneStrategy strategy={strategy}

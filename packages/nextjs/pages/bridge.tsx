@@ -258,7 +258,7 @@ const Bridge: NextPage = () => {
           cutting-edge Token Bridge feature, powered by Chainlink CCIP.
         </p>
 
-        {chain && (
+        {chain ? (
           <>
             <div className={"flex flex-row justify-between mb-6"}>
               <div className="flex flex-col w-full lg:flex-row">
@@ -333,6 +333,8 @@ const Bridge: NextPage = () => {
               </button>
             </div>
           </>
+        ) : (
+          <p className={"text-center text-red-700 text-lg"}>Please connect wallet to bridge tokens</p>
         )}
       </div>
     </>

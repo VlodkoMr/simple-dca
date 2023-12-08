@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import {RainbowKitCustomConnectButton} from "~~/components/scaffold-eth";
+import { useRouter } from "next/router";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 export const Header = () => {
   const router = useRouter();
@@ -72,7 +72,7 @@ export const Header = () => {
             </Link>
           </li>
           <li className="nav-item">
-            <Link href={"#"} className={`nav-link ${router.pathname == "/whitepaper" ? "active" : ""}`}>
+            <Link href={"/whitepaper"} className={`nav-link ${router.pathname == "/whitepaper" ? "active" : ""}`}>
               Whitepaper
             </Link>
           </li>

@@ -2,13 +2,25 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { MetaHeader } from "~~/components/MetaHeader";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { BottomBanner } from "~~/components/BottomBanner";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const Home: NextPage = () => {
   const { address } = useAccount();
+  const { chain } = useNetwork();
+
+  const { data: allStrategies } = useScaffoldContractRead({
+    contractName: "FlexDCA",
+    functionName: "getAllStrategies",
+    cacheTime: 5_000,
+    chainId: chain?.id || getTargetNetwork().id,
+  });
+
+  console.log(`allStrategies`, allStrategies);
 
   return (
     <>
@@ -64,107 +76,29 @@ const Home: NextPage = () => {
         <div className="container">
           <div className="row justify-between text-center lg:text-start">
             <div className="lg:col-5">
-              <h2>The Highlighting Part Of Our Solution</h2>
+              <h2>All DCA Strategies</h2>
             </div>
             <div className="mt-6 lg:col-5 lg:mt-0">
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi egestas Werat viverra id et aliquet.
-                vulputate egestas sollicitudin .
+                Experience the ease of Dollar Cost Averaging strategy on FlexDCA, where simplicity meets security and
+                decentralisation.
               </p>
             </div>
           </div>
-          <div className="key-feature-grid mt-10 grid grid-cols-2 gap-7 md:grid-cols-3 xl:grid-cols-4">
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Live Caption</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-1.svg" alt="" />
-              </span>
+
+          {allStrategies && (
+            <div className="mt-10 flex flex-row w-full gap-8">
+              {allStrategies.map(strategy => (
+                <div className="flex flex-auto w-1/3 min-w-64 flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
+                  <div className={"flex flex-row justify-between border-b pb-3 mb-4"}>
+                    <h3 className="h4 text-xl lg:text-2xl">{strategy.title}</h3>
+                    <p className={"pt-1"}>{strategy.assetFromTitle} &raquo; {strategy.assetToTitle}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Smart Reply</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-2.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Sound Amplifier</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-3.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Gesture Navigation</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-4.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Dark Theme</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-5.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Privacy Controls</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-6.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Location Controls</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-7.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Security Updates</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-8.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Focus Mode</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-9.svg" alt="" />
-              </span>
-            </div>
-            <div className="flex flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
-              <div>
-                <h3 className="h4 text-xl lg:text-2xl">Family Link</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
-              </div>
-              <span className="icon mt-4">
-                <img className="objec-contain" src="/images/icons/feature-icon-10.svg" alt="" />
-              </span>
-            </div>
-          </div>
+          )}
+
         </div>
       </section>
 

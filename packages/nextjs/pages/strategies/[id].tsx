@@ -1,32 +1,33 @@
-import type {NextPage} from "next";
-import {MetaHeader} from "~~/components/MetaHeader";
+import type { NextPage } from "next";
+import { MetaHeader } from "~~/components/MetaHeader";
 import React from "react";
 import Link from "next/link";
-import {useRouter} from "next/router";
-import {useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {erc20ABI, useAccount, useContractReads, useNetwork} from "wagmi";
-import {formatUnits} from "viem";
-import {repeatOptions} from "~~/config/constants";
-import {JoinStrategy} from "~~/components/modals/JoinStrategy";
-import {DepositStrategy} from "~~/components/modals/DepositStrategy";
+import { useRouter } from "next/router";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { erc20ABI, useAccount, useContractReads, useNetwork } from "wagmi";
+import { formatUnits } from "viem";
+import { repeatOptions } from "~~/config/constants";
+import { JoinStrategy } from "~~/components/modals/JoinStrategy";
+import { DepositStrategy } from "~~/components/modals/DepositStrategy";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const OneStrategy: NextPage = () => {
   const router = useRouter();
-  const {id} = router.query;
-  const {address} = useAccount();
-  const {chain} = useNetwork();
+  const { id } = router.query;
+  const { address } = useAccount();
+  const { chain } = useNetwork();
 
-  const {data: strategy} = useScaffoldContractRead({
+  const { data: strategy } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getStrategy",
-    chainId: chain?.id,
+    chainId: chain?.id || getTargetNetwork().id,
     enabled: !!id,
     cacheOnBlock: true,
     watch: false,
     args: [id],
   });
 
-  const {data: tokenDecimals} = useContractReads({
+  const { data: tokenDecimals } = useContractReads({
     contracts: [
       {
         address: strategy?.fromAsset,
@@ -52,7 +53,7 @@ const OneStrategy: NextPage = () => {
     }
   });
 
-  const {data: myStrategy, refetch: refetchMyStrategy} = useScaffoldContractRead({
+  const { data: myStrategy, refetch: refetchMyStrategy } = useScaffoldContractRead({
     contractName: "FlexDCA",
     functionName: "getAllUserStrategies",
     chainId: chain?.id,
@@ -76,7 +77,7 @@ const OneStrategy: NextPage = () => {
     }).format(timestamp * 1000);
   }
 
-  const {writeAsync: claimWrite} = useScaffoldContractWrite({
+  const { writeAsync: claimWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "claimTokens",
     args: [strategy?.id],
@@ -96,7 +97,7 @@ const OneStrategy: NextPage = () => {
     }
   });
 
-  const {writeAsync: exitWrite} = useScaffoldContractWrite({
+  const { writeAsync: exitWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "exitStrategy",
     args: [strategy?.id],
@@ -253,6 +254,7 @@ const OneStrategy: NextPage = () => {
                         ) : (
                           <div className={"text-center mt-6"}>
                             <button
+                              disabled={!address}
                               onClick={() => document.getElementById('join_strategy_modal')?.showModal()}
                               className={"btn btn-sm rounded-full bg-orange-100 border-orange-200 hover:bg-orange-200 hover:border-orange-300"}>
                               Join Strategy

@@ -6,6 +6,7 @@ import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
 import { OneStrategyStats } from "~~/components/OneStrategyStats";
 import { formatUnits } from "viem";
+import { getTargetNetwork } from "~~/utils/scaffold-eth";
 
 const Statistic: NextPage = () => {
   const { address } = useAccount();
@@ -16,7 +17,7 @@ const Statistic: NextPage = () => {
     contractName: "FlexDCA",
     functionName: "getAllStrategies",
     cacheTime: 5_000,
-    chainId: chain?.id,
+    chainId: chain?.id || getTargetNetwork().id,
   });
 
   const { tokenDecimals } = useTokensDecimal({ allStrategies });
@@ -74,7 +75,7 @@ const Statistic: NextPage = () => {
           <p>Processed stables: <b>{totalProcessed} USD</b></p>
         </div>
 
-        {tokenDecimals && Object.keys(tokenDecimals).length > 0 && myStrategies ? (
+        {tokenDecimals && Object.keys(tokenDecimals).length > 0 ? (
           <div className={"mb-24 flex flex-wrap flex-row gap-10 justify-center"}>
             {allStrategies?.map((strategy, index) => (
               <OneStrategyStats strategy={strategy}

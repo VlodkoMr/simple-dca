@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import {formatUnits} from "viem";
-import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
-import {useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import { formatUnits } from "viem";
+import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useAccount } from "wagmi";
 
 
 interface OneStrategyProps {
@@ -11,16 +12,16 @@ interface OneStrategyProps {
   myStrategiesObj: Record<number, UserStrategy>;
   handleJoin: (e: any, strategy: Strategy) => void;
   handleDeposit: (strategy: Strategy) => void;
-  tokenDecimals: Record<string, number> | undefined;
+  tokenDecimals: Record<string, number>|undefined;
 }
 
 export const OneStrategy = ({
-  strategy, index, tokenDecimals, myStrategiesObj, handleJoin, handleDeposit
-}: OneStrategyProps) => {
-
+                              strategy, index, tokenDecimals, myStrategiesObj, handleJoin, handleDeposit
+                            }: OneStrategyProps) => {
+  const { address } = useAccount();
   const [isMenuLoading, setIsMenuLoading] = React.useState(false);
 
-  const {writeAsync: exitWrite} = useScaffoldContractWrite({
+  const { writeAsync: exitWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "exitStrategy",
     args: [strategy.id],
@@ -41,7 +42,7 @@ export const OneStrategy = ({
     }
   });
 
-  const {writeAsync: claimWrite} = useScaffoldContractWrite({
+  const { writeAsync: claimWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "claimTokens",
     args: [strategy.id],
@@ -127,6 +128,7 @@ export const OneStrategy = ({
             <>
               {strategy.isActive && (
                 <button
+                  disabled={!address}
                   className={"btn btn-sm border-white rounded-full hover:bg-orange-300 hover:border-orange-400 px-6 outline-none"}
                   onClick={(e) => handleJoin(e, strategy)}>
                   Join
