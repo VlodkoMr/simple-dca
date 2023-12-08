@@ -340,16 +340,32 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         userStrategyDetail.amountLeft -= _amount;
         strategy.totalBalance -= _amount;
 
-        // transfer native token fees to bridge
-        (bool _transferResult,) = payable(address(bridgeContract)).call{value: msg.value}("");
-        require(_transferResult, "DCA#14: fees transfer failed");
-
         string memory _data = string(abi.encodePacked(
             _destStrategyId,
             _amount,
             msg.sender
         ));
-        bridgeContract.bridgeTokens(_destinationChainSelector, _receiverContract, _data);
+        bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data);
+    }
+
+    // token deposited from bridge
+    function bridgeDeposit(uint256 _amount, uint32 _strategyId, address _owner)
+    external
+    strategyExists(_strategyId)
+    {
+        require(_amount > 0, "DCA#04: amount must be greater than 0");
+        require(msg.sender == address(bridgeContract), "DCA#04: only bridge contract can call this method");
+        require(userStrategyDetails[_owner][_strategyId].strategyId != 0, "DCA#01: user strategy does not exist");
+
+        Strategy storage strategy = strategies[_strategyId];
+        strategy.totalBalance += _amount;
+
+        UserStrategyDetails storage userStrategyDetail = userStrategyDetails[_owner][_strategyId];
+        userStrategyDetail.amountLeft += _amount;
+
+        if (userStrategyDetail.isActive == false) {
+            _activateUserStrategy(_strategyId, _owner);
+        }
     }
 
     // ---------------------- Private ----------------------

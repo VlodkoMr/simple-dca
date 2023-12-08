@@ -6,24 +6,23 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-
+import {IFlexDCA} from "./interface/IFlexDCA.sol";
 
 contract Bridge is CCIPReceiver {
     address private immutable iRouter;
     address private immutable flexDCAContract;
     bool public immutable isTestnet;
     bytes32 public latestMessageId;
-    string public latestMessage;
+//    string public latestMessage;
     string public chainSelector;
 
-    event MessageTest(uint, uint);
     event MessageSent(bytes32 messageId);
 
     event MessageReceived(
-        bytes32 latestMessageId,
+        bytes32 latestMessageId
 //        uint64 latestSourceChainSelector,
 //        address latestSender,
-        string latestMessage
+//        string latestMessage
     );
 
     modifier onlyFlexDCAContract() {
@@ -88,9 +87,6 @@ contract Bridge is CCIPReceiver {
             _data
         );
 
-        emit MessageTest(1, msg.value);
-        emit MessageTest(1, _fee);
-
         require(msg.value >= _fee, "Bridge#02: Not enough fees");
 
         bytes32 _messageId = IRouterClient(iRouter).ccipSend{value: _fee}(
@@ -101,20 +97,25 @@ contract Bridge is CCIPReceiver {
         emit MessageSent(_messageId);
     }
 
-
     function _ccipReceive(
         Client.Any2EVMMessage memory _message
     ) internal override {
         latestMessageId = _message.messageId;
 //        latestSourceChainSelector = _message.sourceChainSelector;
 //        latestSender = abi.decode(_message.sender, (address));
-        latestMessage = abi.decode(_message.data, (string));
-//
+        (uint32 _strategyId, uint256 _amount, address _owner) = abi.decode(_message.data, (uint32, uint256, address));
+
         emit MessageReceived(
-            latestMessageId,
+            latestMessageId
 //            latestSourceChainSelector,
 //            latestSender,
-            latestMessage
+//            latestMessage
+        );
+
+        IFlexDCA(flexDCAContract).bridgeDeposit(
+            _amount,
+            _strategyId,
+            _owner
         );
     }
 

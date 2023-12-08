@@ -226,6 +226,14 @@ const OneStrategy: NextPage = () => {
                                   Claim {strategy.assetToTitle}
                                 </button>
                               )}
+
+                              {myStrategy?.amountLeft > 0 && (
+                                <Link href={`/bridge?id=${strategy.id}`}
+                                      className={"filter-btn btn btn-sm inline-block border border-gray-200 hover:bg-orange-100 hover:border-orange-200 text-dark"}>
+                                  Bridge {strategy.assetFromTitle}
+                                </Link>
+                              )}
+
                               <button
                                 onClick={() => document.getElementById('deposit_strategy_modal')?.showModal()}
                                 className={"filter-btn btn btn-sm inline-block border border-gray-200 hover:bg-orange-100 hover:border-orange-200 text-dark"}>

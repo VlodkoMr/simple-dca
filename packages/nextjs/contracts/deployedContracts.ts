@@ -621,7 +621,7 @@ const deployedContracts = {
   },
   80001: {
     Bridge: {
-      address: "0xab350E8FD375D72F405Bd3Ac14595Fc1b730ccec",
+      address: "0xfb339Cf132C14Da36D1F1B1f704174F8a4caF6E9",
       abi: [
         {
           inputs: [
@@ -669,12 +669,6 @@ const deployedContracts = {
               name: "latestMessageId",
               type: "bytes32",
             },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "latestMessage",
-              type: "string",
-            },
           ],
           name: "MessageReceived",
           type: "event",
@@ -690,25 +684,6 @@ const deployedContracts = {
             },
           ],
           name: "MessageSent",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "MessageTest",
           type: "event",
         },
         {
@@ -900,19 +875,6 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "latestMessage",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
           name: "latestMessageId",
           outputs: [
             {
@@ -958,7 +920,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0xd6E6f17C84e4EaF404fAD99C2972FD510Dde543a",
+      address: "0x862032733d458306eCd41FdA5731651Ef999eF3F",
       abi: [
         {
           inputs: [
@@ -1076,6 +1038,29 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+            {
+              internalType: "address",
+              name: "_owner",
+              type: "address",
+            },
+          ],
+          name: "bridgeDeposit",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -1742,7 +1727,7 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0xF03ABFbC4c220bE02A38965ADAca10c0Ae187889",
+      address: "0x6a732a30e38947477C784BDAFFf633564576177a",
       abi: [
         {
           inputs: [
@@ -1789,12 +1774,6 @@ const deployedContracts = {
               internalType: "bytes32",
               name: "latestMessageId",
               type: "bytes32",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "latestMessage",
-              type: "string",
             },
           ],
           name: "MessageReceived",
@@ -2002,19 +1981,6 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "latestMessage",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
           name: "latestMessageId",
           outputs: [
             {
@@ -2060,7 +2026,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x3ecFA9c1B27dE200fa3bf4da20BC776382505bD2",
+      address: "0x62F74943b6e153E9BB706a4F120b51D6D3276c6c",
       abi: [
         {
           inputs: [
@@ -2178,6 +2144,29 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+            {
+              internalType: "uint32",
+              name: "_strategyId",
+              type: "uint32",
+            },
+            {
+              internalType: "address",
+              name: "_owner",
+              type: "address",
+            },
+          ],
+          name: "bridgeDeposit",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {

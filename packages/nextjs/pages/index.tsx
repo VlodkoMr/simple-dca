@@ -8,6 +8,8 @@ import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { BottomBanner } from "~~/components/BottomBanner";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import { formatUnits } from "viem";
+import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
 
 const Home: NextPage = () => {
   const { address } = useAccount();
@@ -19,6 +21,8 @@ const Home: NextPage = () => {
     cacheTime: 5_000,
     chainId: chain?.id || getTargetNetwork().id,
   });
+
+  const { tokenDecimals } = useTokensDecimal({ allStrategies });
 
   console.log(`allStrategies`, allStrategies);
 
@@ -65,7 +69,7 @@ const Home: NextPage = () => {
         />
       </section>
 
-      <section className="section key-feature relative">
+      <section className="section key-feature relative mb-0 pb-0">
         <Image
           className="absolute left-0 top-0 -z-[1] -translate-y-1/2"
           src="/images/icons/feature-shape.svg"
@@ -78,7 +82,7 @@ const Home: NextPage = () => {
             <div className="lg:col-5">
               <h2>All DCA Strategies</h2>
             </div>
-            <div className="mt-6 lg:col-5 lg:mt-0">
+            <div className="mt-6 lg:col-5 lg:mt-0 text-right">
               <p>
                 Experience the ease of Dollar Cost Averaging strategy on FlexDCA, where simplicity meets security and
                 decentralisation.
@@ -89,12 +93,29 @@ const Home: NextPage = () => {
           {allStrategies && (
             <div className="mt-10 flex flex-row w-full gap-8">
               {allStrategies.map(strategy => (
-                <div className="flex flex-auto w-1/3 min-w-64 flex-col justify-between rounded-lg bg-white p-5 shadow-lg">
+                <Link href={`/strategies/${strategy.id}`}
+                      key={strategy.id}
+                      className="flex flex-auto w-1/3 min-w-64 flex-col justify-between rounded-lg bg-white p-5 shadow-lg border border-white hover:border-orange-300 hover:bg-orange-50">
                   <div className={"flex flex-row justify-between border-b pb-3 mb-4"}>
                     <h3 className="h4 text-xl lg:text-2xl">{strategy.title}</h3>
                     <p className={"pt-1"}>{strategy.assetFromTitle} &raquo; {strategy.assetToTitle}</p>
                   </div>
-                </div>
+                  <div>
+                    Assets in queue: <b>{
+                    parseFloat(formatUnits(strategy.totalBalance, tokenDecimals[strategy.fromAsset])).toFixed(2)
+                  } {strategy.assetFromTitle}</b>
+                  </div>
+                  <div>
+                    Total spent: <b>{
+                    parseFloat(formatUnits(strategy.totalAmountFromAsset, tokenDecimals[strategy.fromAsset])).toFixed(2)
+                  } {strategy.assetFromTitle}</b>
+                  </div>
+                  <div>
+                    Total received: <b>{
+                    parseFloat(formatUnits(strategy.totalAmountToAsset, tokenDecimals[strategy.fromAsset])).toFixed(4)
+                  } {strategy.assetToTitle}</b>
+                  </div>
+                </Link>
               ))}
             </div>
           )}
@@ -102,78 +123,76 @@ const Home: NextPage = () => {
         </div>
       </section>
 
-      <section className="section services">
+      <section className="section services mb-0 pb-6">
         <div className="container">
-          <div className="tab row gx-5 items-center" data-tab-group="integration-tab">
+          <div className=" row gx-5 items-center" data-tab-group="integration-tab">
             <div className="lg:col-7 lg:order-2">
-              <div className="tab-content" data-tab-content>
+              <div className="tab-content">
                 <div className="tab-content-panel active" data-tab-panel="0">
                   <img className="w-full object-contain" src="/images/sells-by-country.png" />
                 </div>
-                <div className="tab-content-panel" data-tab-panel="1">
-                  <img className="w-full object-contain" src="/images/collaboration.png" />
-                </div>
-                <div className="tab-content-panel" data-tab-panel="2">
-                  <img className="w-full object-contain" src="/images/sells-by-country.png" />
-                </div>
               </div>
             </div>
+
             <div className="mt-6 lg:col-5 lg:order-1 lg:mt-0">
               <div className="text-container">
-                <h2 className="lg:text-4xl">Prevent failure from to impacting your reputation</h2>
+                <h2 className="lg:text-4xl">Prevent failure for your investments</h2>
                 <p className="mt-4">
-                  Our platform helps you build secure onboarding authentication experiences that retain and engage your
-                  users. We build the infrastructure, you can.
+                  Our platform is designed to fortify your financial strategy and protect against unforeseen challenges.
+                  With robust risk management features and strategic insights, we empower you to navigate the market confidently, preventing
+                  failures and securing the success of your investments.
                 </p>
-                <ul className="tab-nav -ml-4 mt-8 border-b-0" data-tab-nav>
-                  <li className="tab-nav-item active" data-tab="0">
-                    <img className="mr-3" src="/images/icons/drop.svg" alt="" />
-                    Habit building essential choose habit
-                  </li>
-                  <li className="tab-nav-item" data-tab="1">
-                    <img className="mr-3" src="/images/icons/brain.svg" alt="" />
-                    Get an overview of Habit Calendars.
-                  </li>
-                  <li className="tab-nav-item" data-tab="2">
-                    <img className="mr-3" src="/images/icons/timer.svg" alt="" />
-                    Start building with Habitify platform
-                  </li>
-                </ul>
+                <div className="tab-nav -ml-4 mt-8 border-b-0">
+                  <Link href={"/whitepaper"} className="block flex bg-gray-200 rounded-full py-2 px-6 hover:bg-orange-100">
+                    <img className="mr-3" src="/images/icons/arrow-right.svg" alt="" />
+                    Read Whitepaper
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-          <div className="row gx-5 mt-12 items-center lg:mt-0">
-            <div className="lg:col-7">
+
+
+          <div className="row gx-5 mt-8 items-center lg:mt-0">
+            <div className="lg:col-5">
               <div className="relative">
                 <img className="w-full object-contain" src="/images/collaboration.png" />
                 <img className="absolute bottom-6 left-1/2 -z-[1] -translate-x-1/2" src="/images/shape.svg" alt="" />
               </div>
             </div>
-            <div className="mt-6 lg:col-5 lg:mt-0">
-              <div className="text-container">
-                <h2 className="lg:text-4xl">Accept payments any country in this whole universe</h2>
+            <div className="mt-6 lg:col-7 lg:mt-0">
+              <div className="max-w-lg mx-auto">
+                <h2 className="lg:text-4xl">
+                  Our Technologies
+                </h2>
                 <p className="mt-4">
-                  Donec sollicitudin molestie malesda. Donec sollitudin molestie malesuada. Mauris pellentesque nec,
-                  egestas non nisi. Cras ultricies ligula sed
+                  Powered by a dynamic fusion of innovative technologies, our platform integrates the prowess of Chainlink, Balancer, and
+                  Uniswap. Chainlink enhances data reliability and decentralized computations, Balancer optimizes liquidity, and Uniswap
+                  provides a decentralized and efficient trading environment.
                 </p>
-                <ul className="mt-6 text-dark lg:-ml-4">
-                  <li className="mb-2 flex items-center rounded px-4">
+                <ul className="mt-6 text-dark lg:-ml-4 mb-10">
+                  <li className="mb-3 flex items-center rounded px-4 leading-5">
                     <img className="mr-3" src="/images/icons/checkmark-circle.svg" alt="" />
-                    Supporting more than 119 country world
+                    <p><b>Chainlink Automation</b> execute your strategy on time, with custom settings.</p>
                   </li>
-                  <li className="mb-2 flex items-center rounded px-4">
+                  <li className="mb-3 flex items-center rounded px-4 leading-5">
                     <img className="mr-3" src="/images/icons/checkmark-circle.svg" alt="" />
-                    Open transaction with more than currencies
+                    <p><b>Chainlink Data Feed</b> enshure your strategy is executed with the right price.</p>
                   </li>
-                  <li className="flex items-center rounded px-4">
+                  <li className="mb-3 flex items-center rounded px-4 leading-5">
                     <img className="mr-3" src="/images/icons/checkmark-circle.svg" alt="" />
-                    Customer Service with 79 languages
+                    <p><b>Chainlink CCIP</b> allow to bridge assets between blockchains and diversify your DCA strategy.</p>
+                  </li>
+                  <li className="flex items-center rounded px-4 leading-5">
+                    <img className="mr-3" src="/images/icons/checkmark-circle.svg" alt="" />
+                    <p><b>Multichain support</b>: Polygon, Polygon ZkEVM and Avalanche.</p>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
-          <div className="row gx-5 mt-12 items-center lg:mt-0">
+
+          <div className="row gx-5 mt-12 items-center lg:mt-10">
             <div className="lg:col-7 lg:order-2">
               <div className="video pb-5 pr-9">
                 <div className="video-thumbnail overflow-hidden rounded-2xl">
@@ -188,12 +207,12 @@ const Home: NextPage = () => {
             </div>
             <div className="mt-6 lg:col-5 lg:order-1 lg:mt-0">
               <div className="text-container">
-                <h2 className="lg:text-4xl">Accountability that works for you</h2>
+                <h2 className="lg:text-4xl">User-Friendly Onboarding</h2>
                 <p className="mt-4">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi egestas Werat viverra id et aliquet.
-                  vulputate egestas sollicitudin .
+                  Joining the future of finance has never been easier. Our user-friendly onboarding process allows you to connect your
+                  Metamask wallet, choose a supported network, and start investing within minutes.
                 </p>
-                <button className="btn btn-white mt-6">know about us</button>
+                <Link href={"/whitepaper"} className="btn btn-white mt-6">know about us</Link>
               </div>
             </div>
           </div>
@@ -205,19 +224,18 @@ const Home: NextPage = () => {
           <div className="row">
             <div className="text-center lg:col-4 lg:text-start">
               <h2>Frequently Asked Questions</h2>
-              <p className="mt-6 lg:max-w-[404px]">
-                Vestibulum ante ipsum primis in faucibus orci luctus ultrices posuere
-                cubilia Curae Donec
+              <p className="mt-6 lg:max-w-[404px] pr-8">
+                Leat more about FlexDCA and how it can help you to automate your crypto investments.
               </p>
             </div>
             <div className="mt-8 lg:col-8 lg:mt-0">
               <div className="rounded-xl bg-white px-5 py-5 shadow-lg lg:px-10 lg:py-8">
-                <div className="accordion active border-b border-border">
+                <div className="collapse active border-b border-border">
+                  <input type="radio" name="my-accordion-1" />
                   <div
-                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
-                    data-accordion
+                    className="accordion-header relative pl-6 collapse-title text-lg font-semibold text-dark"
                   >
-                    How can I integrate Avocode to my current tool stack?
+                    What is DCA strategy and FlexDCA platform?
                     <svg
                       className="accordion-icon absolute left-0 top-[22px]"
                       x="0px"
@@ -231,25 +249,26 @@ const Home: NextPage = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="accordion-content pl-6">
-                    <p>
-                      The Service is provided for free during this pilot project, and
-                      is provided "as is" with is not committed to any level of
-                      service or availability of the Service.
+                  <div className="collapse-content pl-6">
+                    <p className={"mb-4"}>
+                      FlexDCA offers a dynamic platform for seamlessly swapping cryptocurrencies into your preferred tokens using Dollar
+                      Cost Averaging (DCA) strategies. Our mission is to provide innovative strategies that empower you to diversify and
+                      enhance your crypto portfolio.
                     </p>
                     <p>
-                      If you enter into this agreement on behalf of a company, you
-                      hereby agree that the company is responsible under this
-                      Agreement for all actions and
+                      Dollar Cost Averaging (DCA) is a proven investment strategy, involving the consistent purchase of assets at fixed
+                      intervals, regardless of their current market price. By acquiring more of an asset when prices are low and less when
+                      prices are high, DCA helps mitigate the impact of market volatility. At FlexDCA, we leverage DCA to provide you with a
+                      secure and strategic approach to navigating the dynamic cryptocurrency landscape.
                     </p>
                   </div>
                 </div>
-                <div className="accordion border-b border-border">
+                <div className="collapse border-b border-border">
+                  <input type="radio" name="my-accordion-1" />
                   <div
-                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
-                    data-accordion
+                    className="accordion-header collapse-title relative pl-6 text-lg font-semibold text-dark"
                   >
-                    How can I use Avocode with cloud documents?
+                    How can I use FlexDCA?
                     <svg
                       className="accordion-icon absolute left-0 top-[22px]"
                       x="0px"
@@ -263,25 +282,20 @@ const Home: NextPage = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="accordion-content pl-6">
+                  <div className="collapse-content pl-6">
                     <p>
-                      The Service is provided for free during this pilot project, and
-                      is provided "as is" with is not committed to any level of
-                      service or availability of the Service.
-                    </p>
-                    <p>
-                      If you enter into this agreement on behalf of a company, you
-                      hereby agree that the company is responsible under this
-                      Agreement for all actions and
+                      Getting started is a breeze! Simply connect your Metamask wallet and switch to one of our supported networks. From
+                      there, explore and select a strategy that aligns with your investment goals. It's that easy – you're now ready to
+                      kickstart your investment journey with just a few clicks.
                     </p>
                   </div>
                 </div>
-                <div className="accordion border-b border-border">
+                <div className="collapse border-b border-border">
+                  <input type="radio" name="my-accordion-1" />
                   <div
-                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
-                    data-accordion
+                    className="accordion-header collapse-title relative pl-6 text-lg font-semibold text-dark"
                   >
-                    If I cancel, can I archive my designs to keep them safe come back?
+                    What platform fees are charged?
                     <svg
                       className="accordion-icon absolute left-0 top-[22px]"
                       x="0px"
@@ -295,48 +309,9 @@ const Home: NextPage = () => {
                       ></path>
                     </svg>
                   </div>
-                  <div className="accordion-content pl-6">
+                  <div className="collapse-content pl-6">
                     <p>
-                      The Service is provided for free during this pilot project, and
-                      is provided "as is" with is not committed to any level of
-                      service or availability of the Service.
-                    </p>
-                    <p>
-                      If you enter into this agreement on behalf of a company, you
-                      hereby agree that the company is responsible under this
-                      Agreement for all actions and
-                    </p>
-                  </div>
-                </div>
-                <div className="accordion">
-                  <div
-                    className="accordion-header relative pl-6 text-lg font-semibold text-dark"
-                    data-accordion
-                  >
-                    How can I adjust user permissions & admin provileges?
-                    <svg
-                      className="accordion-icon absolute left-0 top-[22px]"
-                      x="0px"
-                      y="0px"
-                      viewBox="0 0 512 512"
-                      xmlSpace="preserve"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M505.755,123.592c-8.341-8.341-21.824-8.341-30.165,0L256.005,343.176L36.421,123.592c-8.341-8.341-21.824-8.341-30.165,0 s-8.341,21.824,0,30.165l234.667,234.667c4.16,4.16,9.621,6.251,15.083,6.251c5.462,0,10.923-2.091,15.083-6.251l234.667-234.667 C514.096,145.416,514.096,131.933,505.755,123.592z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <div className="accordion-content pl-6">
-                    <p>
-                      The Service is provided for free during this pilot project, and
-                      is provided "as is" with is not committed to any level of
-                      service or availability of the Service.
-                    </p>
-                    <p>
-                      If you enter into this agreement on behalf of a company, you
-                      hereby agree that the company is responsible under this
-                      Agreement for all actions and
+                      We get 1% fee that applied to the total transaction amount when strategy executes a swap.
                     </p>
                   </div>
                 </div>

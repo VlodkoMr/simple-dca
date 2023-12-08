@@ -7,12 +7,13 @@ import { useTokensDecimal } from "~~/hooks/useTokensDecimal";
 import { useAccount, useBalance } from "wagmi";
 import { utils } from "ethers";
 import { formatEther, formatUnits, parseUnits } from "viem";
+import { useSearchParams } from "next/navigation";
 
 const destinationChainSelectorMap = {
-  11155111: "16015286601757825753", // sepolia
-  43114: "6433500567565415381", // avalanche
-  137: "4051577828743386545", // polygon
-  80001: "12532609583862916517", // mumbai
+  11155111: BigInt("16015286601757825753"), // sepolia
+  43114: BigInt("6433500567565415381"), // avalanche
+  137: BigInt("4051577828743386545"), // polygon
+  80001: BigInt("12532609583862916517"), // mumbai
 }
 
 const DestinationSection = ({ destinationChainId, setDestinationChainId, destinationStrategyId, setDestinationStrategyId }: {
@@ -113,11 +114,14 @@ const DestinationSection = ({ destinationChainId, setDestinationChainId, destina
 const Bridge: NextPage = () => {
   const { chain } = getNetwork();
   const { address } = useAccount();
+  const searchParams = useSearchParams();
+  const selectedId = searchParams.get('id');
+
   const [myStrategiesObj, setMyStrategiesObj] = useState({});
   const [bridgeAmount, setBridgeAmount] = useState();
   const [destinationChainId, setDestinationChainId] = useState();
   const [destinationStrategyId, setDestinationStrategyId] = useState();
-  const [currentStrategyId, setCurrentStrategyId] = useState();
+  const [currentStrategyId, setCurrentStrategyId] = useState(selectedId);
 
   const { data: native } = useBalance({
     address: address,
@@ -154,7 +158,7 @@ const Bridge: NextPage = () => {
         }
       });
 
-      return parseUnits(bridgeAmount.toString(), tokenDecimals[fromAsset]);
+      return BigInt(parseUnits(bridgeAmount.toString(), tokenDecimals[fromAsset]));
     }
     return 0;
   }, [bridgeAmount, currentStrategyId, allStrategies, tokenDecimals]);
@@ -165,8 +169,6 @@ const Bridge: NextPage = () => {
     }
     return "";
   }, [destinationStrategyId, bridgeAmountWei, address]);
-
-  console.log(`feeEstimateData`, feeEstimateData);
 
   const { data: bridgeMessageFee } = useScaffoldContractRead({
     contractName: "Bridge",
@@ -183,7 +185,8 @@ const Bridge: NextPage = () => {
 
   const nativeFeeFormatted = useMemo(() => {
     if (bridgeMessageFee && native) {
-      return parseFloat(formatUnits(bridgeMessageFee[1], native?.decimals));
+      const amount = parseFloat(formatUnits(bridgeMessageFee[1], native?.decimals));
+      return amount + amount * 0.01;
     }
     return 0;
   }, [bridgeMessageFee, native]);
@@ -197,7 +200,7 @@ const Bridge: NextPage = () => {
       destinationContract?.address,
       currentStrategyId,
       destinationStrategyId,
-      bridgeAmountWei,
+      bridgeAmountWei || 0,
     ],
     value: nativeFeeFormatted,
     enabled: !!destinationChainId && !!destinationContract?.address && !!bridgeAmount,
@@ -320,7 +323,7 @@ const Bridge: NextPage = () => {
 
             {bridgeMessageFee && native && (
               <div className={"text-center mb-2 mt-2 opacity-60"}>
-                Bridge tx fee: {parseFloat(nativeFeeFormatted).toFixed(5)} {native?.symbol}
+                Bridge fee: {parseFloat(nativeFeeFormatted).toFixed(5)} {native?.symbol}
               </div>
             )}
 

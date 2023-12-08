@@ -41,6 +41,8 @@ export const OneStrategyStats = (
       } {strategy.assetToTitle}</b>
       </div>
 
+      <div>avg price</div>
+
     </div>
   );
 };
