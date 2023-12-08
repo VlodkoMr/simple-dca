@@ -29,6 +29,11 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     mapping(address => mapping(uint32 => UserStrategyDetails)) public userStrategyDetails;
     mapping(address => uint32[]) public userStrategies;
 
+    event JoinedStrategy(address indexed user, uint32 strategyId);
+    event ExitedStrategy(address indexed user, uint32 strategyId);
+    event ClaimedStrategy(address indexed user, uint32 strategyId);
+    event Deposit(address indexed user, uint32 strategyId, uint256 amount);
+
     struct Strategy {
         uint32 id;
         uint32 usersLimit;
@@ -109,6 +114,8 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
                 isActive: false
             });
             userStrategies[msg.sender].push(_strategyId);
+            emit JoinedStrategy(msg.sender, _strategyId);
+
         } else {
             UserStrategyDetails storage _userStrategyDetails = userStrategyDetails[msg.sender][_strategyId];
             _userStrategyDetails.executeRepeat = _executeRepeat;
@@ -137,6 +144,8 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
         userStrategyDetail.amountLeft += _amount;
 
+        emit Deposit(msg.sender, _strategyId, _amount);
+
         if (userStrategyDetail.isActive == false) {
             _activateUserStrategy(_strategyId, msg.sender);
         }
@@ -151,6 +160,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
 
         // return unused amount
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
+        emit ExitedStrategy(msg.sender, _strategyId);
 
         if (userStrategyDetail.amountLeft > 0) {
             uint256 _amount = userStrategyDetail.amountLeft;
@@ -181,6 +191,8 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
 
         // platform fees
         _transferTokens(strategies[_strategyId].toAsset, feeCollector, _amountFee);
+
+        emit ClaimedStrategy(msg.sender, _strategyId);
     }
 
     function getAllUserStrategies(address _user)
@@ -336,7 +348,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
         Strategy storage strategy = strategies[_strategyId];
 
-        require(userStrategyDetail.amountLeft <= _amount, "DCA#13: amount exceeds balance");
+        require(userStrategyDetail.amountLeft >= _amount, "DCA#13: amount exceeds balance");
         userStrategyDetail.amountLeft -= _amount;
         strategy.totalBalance -= _amount;
 
@@ -345,6 +357,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             _amount,
             msg.sender
         ));
+
         bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data);
     }
 

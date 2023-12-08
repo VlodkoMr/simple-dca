@@ -66,6 +66,8 @@ yarn deploy --network polygonMumbai --reset
 yarn verify --network polygonMumbai
 ```
 
+You can get test USDC on Uniswap (USDC in the list when you switched to Mumbai network).
+
 ### Deploy and Verify on Polygon zkEVM:
 
 ``` 

@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo, useState} from "react";
-import {useDeployedContractInfo, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {BigNumber} from "@ethersproject/bignumber";
-import {erc20ABI, useAccount, useBalance, useContractRead, useToken} from "wagmi";
-import {formatUnits, parseUnits} from "viem";
-import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
-import {repeatOptions} from "~~/config/constants";
-import {getNetwork} from "@wagmi/core";
+import React, { useEffect, useMemo, useState } from "react";
+import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { BigNumber } from "@ethersproject/bignumber";
+import { erc20ABI, useAccount, useBalance, useContractRead, useToken, useWaitForTransaction } from "wagmi";
+import { formatUnits, parseUnits } from "viem";
+import { useScaffoldAddressWrite } from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
+import { repeatOptions } from "~~/config/constants";
+import { getNetwork } from "@wagmi/core";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -17,11 +17,11 @@ const defaultSplitCount = 10;
 const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
 
 export const JoinStrategy = ({
-  strategy,
-  onUpdate
-}: MetaHeaderProps) => {
+                               strategy,
+                               onUpdate
+                             }: MetaHeaderProps) => {
   const account = useAccount();
-  const {chain} = getNetwork();
+  const { chain } = getNetwork();
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState("");
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
@@ -29,14 +29,14 @@ export const JoinStrategy = ({
   const [repeat, setRepeat] = useState(defaultRepeat);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {data: fromToken} = useToken({
+  const { data: fromToken } = useToken({
     address: strategy?.fromAsset,
     enabled: !!strategy?.fromAsset,
   });
 
-  const {data: flexDCAContract} = useDeployedContractInfo("FlexDCA");
+  const { data: flexDCAContract } = useDeployedContractInfo("FlexDCA");
 
-  const {data: tokenAllowance} = useContractRead({
+  const { data: tokenAllowance } = useContractRead({
     address: strategy?.fromAsset,
     abi: erc20ABI,
     chainId: chain?.id,
@@ -45,7 +45,7 @@ export const JoinStrategy = ({
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address,
   });
 
-  const {data: fromTokenBalance} = useBalance({
+  const { data: fromTokenBalance } = useBalance({
     address: account?.address,
     token: strategy?.fromAsset,
     chainId: chain?.id,
@@ -77,7 +77,7 @@ export const JoinStrategy = ({
     }
   }, [strategy]);
 
-  const {writeAsync: joinStrategyWrite} = useScaffoldContractWrite({
+  const { write: joinStrategyWrite, data: joinData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
     args: [strategy?.id, BigNumber.from(repeat).mul(10).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
@@ -88,22 +88,6 @@ export const JoinStrategy = ({
       setIsLoading(false);
       onUpdate();
     },
-    onBlockConfirmation: (txnReceipt) => {
-      console.log(`joinStrategyWrite txnReceipt`, txnReceipt);
-      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-
-      if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
-        setCurrentStep(2);
-        writeApprove().then(() => {
-          console.log(`+`);
-        });
-      } else {
-        setCurrentStep(3);
-        depositWrite().then(() => {
-          console.log(`+`);
-        });
-      }
-    },
     onSuccess: (tx) => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
@@ -111,27 +95,43 @@ export const JoinStrategy = ({
     }
   });
 
-  const {writeAsync: writeApprove} = useScaffoldAddressWrite({
+  useWaitForTransaction({
+    hash: joinData?.hash,
+    onSuccess: () => {
+      if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
+        setCurrentStep(2);
+        writeApprove();
+      } else {
+        setCurrentStep(3);
+        depositWrite();
+      }
+    }
+  });
+
+
+  const { write: writeApprove, data: approveData } = useScaffoldAddressWrite({
     address: strategy?.fromAsset,
     functionName: "approve",
     abi: erc20ABI,
+    chainId: chain?.id,
     args: [flexDCAContract?.address, Number(totalDepositWei)],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei,
-    onBlockConfirmation: (txnReceipt) => {
-      console.log(`writeApprove txnReceipt`, txnReceipt);
-      setCurrentStep(3);
-      depositWrite().then(() => {
-        console.log(`+`);
-      });
-      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-    },
     onError: (error) => {
       alert(error);
       setIsLoading(false);
     },
   });
 
-  const {writeAsync: depositWrite} = useScaffoldContractWrite({
+  useWaitForTransaction({
+    hash: approveData?.hash,
+    onSuccess: () => {
+      setCurrentStep(3);
+      depositWrite();
+    }
+  });
+
+
+  const { write: depositWrite, data: depositData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "deposit",
     args: [totalDepositWei, strategy?.id],
@@ -140,19 +140,22 @@ export const JoinStrategy = ({
       alert(error);
       setIsLoading(false);
     },
-    onBlockConfirmation: (txnReceipt) => {
-      console.log(`depositWrite txnReceipt`, txnReceipt);
-      setIsLoading(false);
-      onUpdate();
-      document.getElementById('join_strategy_modal')?.close();
-      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-    },
     onSuccess: (tx) => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
     }
   });
+
+  useWaitForTransaction({
+    hash: depositData?.hash,
+    onSuccess: () => {
+      setIsLoading(false);
+      onUpdate();
+      document.getElementById('join_strategy_modal')?.close();
+    }
+  });
+
 
   const setMaxAmount = () => {
     console.log(`fromTokenBalance`, fromTokenBalance);
@@ -173,9 +176,7 @@ export const JoinStrategy = ({
     }
 
     setIsLoading(true);
-    joinStrategyWrite().then(() => {
-      console.log(`+`);
-    });
+    joinStrategyWrite();
   }
 
   return (

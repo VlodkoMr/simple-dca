@@ -18,6 +18,9 @@ contract Bridge is CCIPReceiver {
 
     event MessageSent(bytes32 messageId);
 
+    event TestEvent(string, uint256, uint256);
+
+
     event MessageReceived(
         bytes32 latestMessageId
 //        uint64 latestSourceChainSelector,
@@ -101,16 +104,9 @@ contract Bridge is CCIPReceiver {
         Client.Any2EVMMessage memory _message
     ) internal override {
         latestMessageId = _message.messageId;
-//        latestSourceChainSelector = _message.sourceChainSelector;
-//        latestSender = abi.decode(_message.sender, (address));
         (uint32 _strategyId, uint256 _amount, address _owner) = abi.decode(_message.data, (uint32, uint256, address));
 
-        emit MessageReceived(
-            latestMessageId
-//            latestSourceChainSelector,
-//            latestSender,
-//            latestMessage
-        );
+        emit MessageReceived(latestMessageId);
 
         IFlexDCA(flexDCAContract).addBridgedDeposit(
             _amount,

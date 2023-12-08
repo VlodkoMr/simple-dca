@@ -1,10 +1,10 @@
-import {useState} from "react";
-import {Abi, ExtractAbiFunctionNames} from "abitype";
-import {useContractWrite, useNetwork} from "wagmi";
-import {getParsedError} from "~~/components/scaffold-eth";
-import {useTransactor} from "~~/hooks/scaffold-eth";
-import {getTargetNetwork, notification} from "~~/utils/scaffold-eth";
-import {ContractAbi, ContractName, UseScaffoldWriteConfig} from "~~/utils/scaffold-eth/contract";
+import { useState } from "react";
+import { Abi, ExtractAbiFunctionNames } from "abitype";
+import { useContractWrite, useNetwork } from "wagmi";
+import { getParsedError } from "~~/components/scaffold-eth";
+import { useTransactor } from "~~/hooks/scaffold-eth";
+import { getTargetNetwork, notification } from "~~/utils/scaffold-eth";
+import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite<Abi, string, undefined>>["writeAsync"]>[0];
 
@@ -19,18 +19,18 @@ type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite<Abi, string, un
  */
 export const useScaffoldAddressWrite = <
   TContractName extends ContractName,
-  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable" | "payable">,
+  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable"|"payable">,
 >({
-  address,
-  abi,
-  functionName,
-  args,
-  value,
-  onBlockConfirmation,
-  blockConfirmations,
-  ...writeConfig
-}: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
-  const {chain} = useNetwork();
+    address,
+    abi,
+    functionName,
+    args,
+    value,
+    onBlockConfirmation,
+    blockConfirmations,
+    ...writeConfig
+  }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
+  const { chain } = useNetwork();
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
   const configuredNetwork = getTargetNetwork();
@@ -46,13 +46,13 @@ export const useScaffoldAddressWrite = <
   });
 
   const sendContractWriteTx = async ({
-    args: newArgs,
-    value: newValue,
-    ...otherConfig
-  }: {
+                                       args: newArgs,
+                                       value: newValue,
+                                       ...otherConfig
+                                     }: {
     args?: UseScaffoldWriteConfig<TContractName, TFunctionName>["args"];
     value?: UseScaffoldWriteConfig<TContractName, TFunctionName>["value"];
-  } & UpdatedArgs = {}) => {
+  }&UpdatedArgs = {}) => {
     if (!chain?.id) {
       notification.error("Please connect your wallet");
       return;
@@ -72,7 +72,7 @@ export const useScaffoldAddressWrite = <
               value: newValue ?? value,
               ...otherConfig,
             }),
-          {onBlockConfirmation, blockConfirmations},
+          { onBlockConfirmation, blockConfirmations },
         );
 
         return writeTxResult;

@@ -21,7 +21,7 @@ const { onlyLocalBurnerWallet } = scaffoldConfig;
 
 const defaultChains = [chains.polygonMumbai, chains.sepolia, chains.polygon, chains.avalanche, {
   ...chains.polygonZkEvm,
-  iconUrl: 'https://assets-global.website-files.com/6364e65656ab107e465325d2/642235057dbc06788f6c45c1_polygon-zkevm-logo.png',
+  iconUrl: '/images/zkevm-logo.png',
 }];
 
 // We always want to have mainnet enabled (ENS resolution, ETH price, etc). But only once.

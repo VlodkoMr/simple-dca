@@ -151,7 +151,7 @@ const Bridge: NextPage = () => {
   });
 
   const bridgeAmountWei = useMemo(() => {
-    if (bridgeAmount && allStrategies) {
+    if (bridgeAmount && allStrategies && tokenDecimals) {
       let fromAsset = '';
       allStrategies.map((strategy) => {
         if (parseInt(strategy.id) === currentStrategyId) {
@@ -191,7 +191,7 @@ const Bridge: NextPage = () => {
     return 0;
   }, [bridgeMessageFee, native]);
 
-  const { writeAsync: bridgeWrite } = useScaffoldContractWrite({
+  const { write: bridgeWrite } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "bridgeTokens",
     chainId: chain?.id,

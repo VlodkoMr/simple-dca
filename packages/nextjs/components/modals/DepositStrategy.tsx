@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
-import {useDeployedContractInfo, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
-import {BigNumber} from "@ethersproject/bignumber";
-import {erc20ABI, useAccount, useContractRead, useNetwork, useToken} from "wagmi";
-import {parseUnits} from "viem";
-import {useScaffoldAddressWrite} from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
+import React, { useEffect, useState } from "react";
+import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { BigNumber } from "@ethersproject/bignumber";
+import { erc20ABI, useAccount, useContractRead, useNetwork, useToken, useWaitForTransaction } from "wagmi";
+import { parseUnits } from "viem";
+import { useScaffoldAddressWrite } from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -11,29 +11,31 @@ type MetaHeaderProps = {
 };
 
 export const DepositStrategy = ({
-  strategy,
-  onUpdate
-}: MetaHeaderProps) => {
+                                  strategy,
+                                  onUpdate
+                                }: MetaHeaderProps) => {
   const account = useAccount();
-  const {chain} = useNetwork();
+  const { chain } = useNetwork();
   const [currentStep, setCurrentStep] = useState(1);
   const [totalDeposit, setTotalDeposit] = useState(0);
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
   const [isLoading, setIsLoading] = useState(false);
 
-  const {data: fromToken} = useToken({
+  const { data: fromToken } = useToken({
     address: strategy?.fromAsset,
-    enabled: !!strategy?.fromAsset,
+    enabled: !!strategy?.fromAsset && !!chain?.id,
     chainId: chain?.id,
+    cacheTime: 5_000,
   });
 
-  const {data: flexDCAContract} = useDeployedContractInfo("FlexDCA");
+  const { data: flexDCAContract } = useDeployedContractInfo("FlexDCA");
 
-  const {data: tokenAllowance} = useContractRead({
+  const { data: tokenAllowance } = useContractRead({
     address: strategy?.fromAsset,
     abi: erc20ABI,
     chainId: chain?.id,
     functionName: "allowance",
+    cacheTime: 5_000,
     args: [account?.address as string, flexDCAContract?.address as string],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!chain?.id,
   });
@@ -54,20 +56,18 @@ export const DepositStrategy = ({
     }
   }, [strategy]);
 
-  const {writeAsync: writeApprove} = useScaffoldAddressWrite({
+  const { write: writeApprove, data: approveData } = useScaffoldAddressWrite({
     address: strategy?.fromAsset,
     functionName: "approve",
     abi: erc20ABI,
     args: [flexDCAContract?.address, Number(totalDepositWei)],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei && !!chain?.id,
-    onBlockConfirmation: (txnReceipt) => {
-      console.log(`txnReceipt`, txnReceipt);
-      depositWrite().then(() => {
-        console.log(`+`);
-      });
-      setCurrentStep(2);
-      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-    },
+    // onBlockConfirmation: (txnReceipt) => {
+    //   console.log(`txnReceipt`, txnReceipt);
+    //   depositWrite();
+    //   setCurrentStep(2);
+    //   // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+    // },
     onError: (error) => {
       alert(error);
       setIsLoading(false);
@@ -76,11 +76,18 @@ export const DepositStrategy = ({
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
+    },
+  });
+
+  useWaitForTransaction({
+    hash: approveData?.hash,
+    onSuccess: () => {
+      depositWrite();
+      setCurrentStep(2);
     }
   });
 
-
-  const {writeAsync: depositWrite} = useScaffoldContractWrite({
+  const { write: depositWrite, data: depositData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "deposit",
     args: [totalDepositWei, strategy?.id],
@@ -89,17 +96,26 @@ export const DepositStrategy = ({
       alert(error);
       setIsLoading(false);
     },
-    onBlockConfirmation: (txnReceipt) => {
-      console.log(`depositWrite txnReceipt`, txnReceipt);
-      setIsLoading(false);
-      onUpdate();
-      document.getElementById('deposit_strategy_modal')?.close();
-      // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-    },
+    // onBlockConfirmation: (txnReceipt) => {
+    //   console.log(`depositWrite txnReceipt`, txnReceipt);
+    //   setIsLoading(false);
+    //   onUpdate();
+    //   document.getElementById('deposit_strategy_modal')?.close();
+    //   // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
+    // },
     onSuccess: (tx) => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
+    }
+  });
+
+  useWaitForTransaction({
+    hash: depositData?.hash,
+    onSuccess: () => {
+      setIsLoading(false);
+      onUpdate();
+      document.getElementById('deposit_strategy_modal')?.close();
     }
   });
 
@@ -111,15 +127,10 @@ export const DepositStrategy = ({
 
     setIsLoading(true);
     if (!tokenAllowance || BigNumber.from(totalDepositWei).gt(BigNumber.from(tokenAllowance))) {
-      console.log(`writeApprove`);
-      writeApprove().then(() => {
-        console.log(`+1`);
-      });
+      writeApprove();
     } else {
       setCurrentStep(2);
-      depositWrite().then(() => {
-        console.log(`+2`);
-      });
+      depositWrite();
     }
   }
 

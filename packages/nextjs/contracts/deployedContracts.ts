@@ -2833,7 +2833,7 @@ const deployedContracts = {
   },
   80001: {
     Bridge: {
-      address: "0x088de01062b45BF31aE0F3a9bcb7E4aE54d0713c",
+      address: "0x25FcC2c454F3d00846Cd41BC61D334AAF4F03c26",
       abi: [
         {
           inputs: [
@@ -3132,7 +3132,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x618698279462139273D898D5767619E9e21687dE",
+      address: "0x05594FbfD430895c5f116CD3a5e57113Aa3941B4",
       abi: [
         {
           inputs: [
@@ -3237,6 +3237,19 @@ const deployedContracts = {
             },
           ],
           name: "OwnershipTransferred",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "TestEvent",
           type: "event",
         },
         {
@@ -3939,7 +3952,7 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0x6a732a30e38947477C784BDAFFf633564576177a",
+      address: "0xF6527FAdeb315490CCFc3E887A1c70703F72a848",
       abi: [
         {
           inputs: [
@@ -4002,6 +4015,31 @@ const deployedContracts = {
             },
           ],
           name: "MessageSent",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "TestEvent",
           type: "event",
         },
         {
@@ -4238,7 +4276,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x62F74943b6e153E9BB706a4F120b51D6D3276c6c",
+      address: "0xcb44d4e7F06Ab7B7E3388a658627C0caB4A9944c",
       abi: [
         {
           inputs: [
@@ -4346,17 +4384,23 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [],
-          name: "bridgeContract",
-          outputs: [
+          anonymous: false,
+          inputs: [
             {
-              internalType: "contract IBridge",
+              indexed: false,
+              internalType: "uint256",
               name: "",
-              type: "address",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
             },
           ],
-          stateMutability: "view",
-          type: "function",
+          name: "TestEvent",
+          type: "event",
         },
         {
           inputs: [
@@ -4376,9 +4420,22 @@ const deployedContracts = {
               type: "address",
             },
           ],
-          name: "bridgeDeposit",
+          name: "addBridgedDeposit",
           outputs: [],
           stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "bridgeContract",
+          outputs: [
+            {
+              internalType: "contract IBridge",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {
