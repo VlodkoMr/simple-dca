@@ -19,6 +19,7 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
 
   const flexDCAContract = await hre.ethers.getContract("FlexDCA", owner);
   const bridgeContract = await hre.ethers.getContract("Bridge", owner);
+  const fDCAContract = await hre.ethers.getContract("TokenFDCA", owner);
 
 
   const pools: Record<string, any> = {
@@ -245,7 +246,10 @@ const dataSeed: DeployFunction = async function (hre: HardhatRuntimeEnvironment)
   };
 
   // set bridgeContract address
-  // await flexDCAContract.setBridgeAddress(bridgeContract.address);
+  await flexDCAContract.setBridgeAddress(bridgeContract.address);
+
+  // set fDCAContract address
+  await flexDCAContract.setTokenFDCAAddress(fDCAContract.address);
 
   // add strategies
   const usersInStrategy = 1000;

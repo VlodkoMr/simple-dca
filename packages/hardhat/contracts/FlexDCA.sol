@@ -12,12 +12,14 @@ import "./helpers/utils.sol";
 import "./interface/ISwapRouterUniswap.sol";
 import "./interface/IBridge.sol";
 import "./interface/IERC20Extended.sol";
+import "./interface/ITokenFDCA.sol";
 
 contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     using SafeERC20 for IERC20;
     IBalancerVault private immutable balancerVault;
     ISwapRouterUniswap private immutable uniswapSwapRouter;
     IBridge public bridgeContract;
+    ITokenFDCA public tokenFDCAContract;
 
     uint16 private constant STRATEGY_FEE_PCT = 1; // 1.0%
     uint16 private constant STRATEGY_FEE_DENOMINATOR = 100;
@@ -56,6 +58,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
         uint256 amountLeft;
         uint256 amountOnce;
         uint256 claimAvailable;
+        uint256 stableLastExchanged;
         uint256 nextExecute;
         uint256 executeRepeat;
         bool isActive;
@@ -110,6 +113,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
                 amountOnce: _amountOnce,
                 nextExecute: block.timestamp + _executeRepeat,
                 claimAvailable: 0,
+                stableLastExchanged: 0,
                 executeRepeat: _executeRepeat,
                 isActive: false
             });
@@ -183,9 +187,14 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     {
         UserStrategyDetails storage userStrategyDetail = userStrategyDetails[msg.sender][_strategyId];
         require(userStrategyDetail.claimAvailable > 0, "DCA#05: nothing to claim");
+
+        // mint fDCA DAO tokens
+        tokenFDCAContract.mintTokens(msg.sender, userStrategyDetail.stableLastExchanged);
+
         uint256 _amount = userStrategyDetail.claimAvailable;
         uint256 _amountFee = _amount * STRATEGY_FEE_PCT / STRATEGY_FEE_DENOMINATOR;
         userStrategyDetail.claimAvailable = 0;
+        userStrategyDetail.stableLastExchanged = 0;
 
         _transferTokens(strategies[_strategyId].toAsset, msg.sender, _amount);
 
@@ -324,6 +333,9 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             UserStrategyDetails storage userStrategyDetail = userStrategyDetails[_users[_i]][_strategyId];
             uint256 _userPart = userStrategyDetail.amountOnce * _denominator / _totalSwap;
             userStrategyDetail.claimAvailable += (_returnAssetResult * _userPart) / _denominator;
+
+            // update total exchanged stablecoins for DAO on claim
+            userStrategyDetail.stableLastExchanged += userStrategyDetail.amountOnce;
         }
     }
 
@@ -601,6 +613,15 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     {
         require(address(bridgeContract) == address(0), "DCA#23: bridge address already set");
         bridgeContract = IBridge(_bridgeAddress);
+    }
+
+    // Update bridge contract address
+    function setTokenFDCAAddress(address _address)
+    public
+    onlyOwner
+    {
+        require(address(tokenFDCAContract) == address(0), "DCA#24: fDCA address already set");
+        tokenFDCAContract = ITokenFDCA(_address);
     }
 
 }

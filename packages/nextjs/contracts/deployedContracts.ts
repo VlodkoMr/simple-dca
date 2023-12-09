@@ -3952,7 +3952,7 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0xd701f1F79910161A35dA1a3cF7637356e2ef624B",
+      address: "0x00fa42155d483eA569A6e8aC80D6062D50BE9CDd",
       abi: [
         {
           inputs: [
@@ -4015,31 +4015,6 @@ const deployedContracts = {
             },
           ],
           name: "MessageSent",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: false,
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "TestEvent",
           type: "event",
         },
         {
@@ -4276,7 +4251,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0xf68aEe169299ea49d5B81025644102418501e153",
+      address: "0x4d4e9E825ec836A5f46D4C6c4e23Ab1D36E13550",
       abi: [
         {
           inputs: [
