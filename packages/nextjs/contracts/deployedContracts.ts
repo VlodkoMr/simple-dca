@@ -3952,7 +3952,7 @@ const deployedContracts = {
   },
   11155111: {
     Bridge: {
-      address: "0xbc3b7B6deF758cAd2599d6d465EAbab42c7f03Ed",
+      address: "0xFDB15118E7bd75387EC4E8756f81f30217423D98",
       abi: [
         {
           inputs: [
@@ -4251,7 +4251,7 @@ const deployedContracts = {
       },
     },
     FlexDCA: {
-      address: "0x6b25A1F8B30f6704753c6656D0ee3D4A35324B1D",
+      address: "0xbE6132feaC060FBacBf6C59F727D4F0E52b55fd8",
       abi: [
         {
           inputs: [
@@ -5174,7 +5174,7 @@ const deployedContracts = {
       },
     },
     TokenFDCA: {
-      address: "0x0e4d8897824c9d89197daE20Dc6AE0EB8aC24Ce4",
+      address: "0x0d1fAA4263A9A5d19610f2b342cA93a42Ec65c42",
       abi: [
         {
           inputs: [
@@ -5408,6 +5408,19 @@ const deployedContracts = {
               internalType: "uint8",
               name: "",
               type: "uint8",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "maxSupply",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
             },
           ],
           stateMutability: "view",

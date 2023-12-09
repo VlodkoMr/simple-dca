@@ -11,7 +11,7 @@ contract TokenFDCA is ERC20 {
     ERC20(_name, _symbol)
     {
         flexDCAContract = _flexDCAContract;
-        _mint(msg.sender, totalSupply / 2);
+        _mint(msg.sender, maxSupply / 2);
     }
 
     function mintTokens(address _address, uint256 _amount) external {

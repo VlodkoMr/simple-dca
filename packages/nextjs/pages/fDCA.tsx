@@ -1,8 +1,23 @@
 import type { NextPage } from "next";
 import { MetaHeader } from "~~/components/MetaHeader";
 import React from "react";
+import { useAccount, useBalance } from "wagmi";
+import { getNetwork } from "@wagmi/core";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 const fDCA: NextPage = () => {
+  const { chain } = getNetwork();
+  const { address } = useAccount();
+  const { data: tokenFDCAContract } = useDeployedContractInfo("TokenFDCA");
+
+  const { data: balance } = useBalance({
+    address: address,
+    token: tokenFDCAContract?.address,
+    chainId: chain?.id,
+    enabled: !!address && !!tokenFDCAContract?.address,
+  });
+
+  console.log(`balance`, balance);
 
   return (
     <>
@@ -21,7 +36,7 @@ const fDCA: NextPage = () => {
         </div>
 
         <div className={"text-lg mt-10 mb-20 text-center"}>
-          <p>My Balance: <span className={"font-bold"}>0 fDCA</span></p>
+          <p>My Balance: <span className={"font-bold"}>{balance?.formatted || 0} fDCA</span></p>
           <button className={"btn btn-gray-200 mt-4 rounded-full"} disabled>Snapshot DAO (coming soon)</button>
         </div>
 
