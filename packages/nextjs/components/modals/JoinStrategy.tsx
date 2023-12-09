@@ -80,8 +80,7 @@ export const JoinStrategy = ({
   const { write: joinStrategyWrite, data: joinData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
-    args: [strategy?.id, BigNumber.from(repeat).mul(10).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
-    // args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
     enabled: !!strategy && !!amountOnce && repeat > 0 && !!chain?.id,
     onError: (error) => {
       alert(error);

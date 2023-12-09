@@ -1,4 +1,5 @@
 export const repeatOptions = {
+  3: "Each 3 hours",
   12: "Twice a day",
   24: "Once a day",
   84: "Twice a week",

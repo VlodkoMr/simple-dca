@@ -523,7 +523,9 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
     private view
     returns (bool)
     {
-        return _sDetails.isActive && _sDetails.nextExecute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
+        // round to execute batch swaps
+        uint256 _execute = (_sDetails.nextExecute / 1000) * 1000;
+        return _sDetails.isActive && _execute <= block.timestamp && _sDetails.amountLeft >= _sDetails.amountOnce;
     }
 
     function _checkReturnedSwapAmount(Strategy storage strategy, uint256 _totalSwap, uint256 _returnAssetResult)
