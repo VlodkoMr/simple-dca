@@ -9,12 +9,15 @@ const fDCA: NextPage = () => {
       <MetaHeader />
 
       <div className={"container max-w-4xl"}>
-        <h2 className={"text-center mt-6 mb-4"}>fDCA Token</h2>
+        <h2 className={"text-center mt-6 mb-1"}>fDCA Token</h2>
+        <div className={"text-center"}>
+          <b className={"block mb-4"}>Max supply: 10 000 000 fDCA</b>
+        </div>
 
         <div className={"mb-3 text-center text-sm mb-8 max-w-xl mx-auto"}>
-          fDCA is the DAO token for our project, distributed at a 1:1 ratio for every USD swapped on our platform. Notably, these tokens are
-          non-transferrable, emphasizing their exclusive use within the DAO ecosystem. Designed for active participation, fDCA holders wield
-          governance influence, contributing to decision-making processes and shaping the project's future.
+          fDCA is the designated DAO token, distributed at a 1:1 ratio for every USD swapped on our platform. Beyond DAO
+          participation, fDCA serves as a versatile asset, enabling holders to access ecosystem rewards, participate in governance, and
+          potentially unlock additional functionalities such as exclusive features or discounts within the broader platform.
         </div>
 
         <div className={"text-lg mt-10 mb-20 text-center"}>
