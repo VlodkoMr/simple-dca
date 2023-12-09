@@ -61,11 +61,11 @@ export const Header = () => {
               Bridge
             </Link>
           </li>
-          {/*<li className="nav-item">*/}
-          {/*  <Link href={"/fDCA"} className={`nav-link ${router.pathname == "/fDCA" ? "active" : ""}`}>*/}
-          {/*    fDCA*/}
-          {/*  </Link>*/}
-          {/*</li>*/}
+          <li className="nav-item">
+            <Link href={"/fDCA"} className={`nav-link ${router.pathname == "/fDCA" ? "active" : ""}`}>
+              fDCA
+            </Link>
+          </li>
           <li className="nav-item">
             <Link href={"/statistic"} className={`nav-link ${router.pathname == "/statistic" ? "active" : ""}`}>
               Statistic
