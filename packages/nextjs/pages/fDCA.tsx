@@ -1,16 +1,18 @@
-import type { NextPage } from "next";
-import { MetaHeader } from "~~/components/MetaHeader";
+import type {NextPage} from "next";
+import {MetaHeader} from "~~/components/MetaHeader";
 import React from "react";
-import { useAccount, useBalance } from "wagmi";
-import { getNetwork } from "@wagmi/core";
-import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+import {useAccount, useBalance} from "wagmi";
+import {getNetwork} from "@wagmi/core";
+import {useDeployedContractInfo} from "~~/hooks/scaffold-eth";
 
 const fDCA: NextPage = () => {
-  const { chain } = getNetwork();
-  const { address } = useAccount();
-  const { data: tokenFDCAContract } = useDeployedContractInfo("TokenFDCA");
+  const {chain} = getNetwork();
+  const {address} = useAccount();
+  const {data: tokenFDCAContract} = useDeployedContractInfo("TokenFDCA");
 
-  const { data: balance } = useBalance({
+  console.log(`tokenFDCAContract?.address`, tokenFDCAContract?.address);
+
+  const {data: balance} = useBalance({
     address: address,
     token: tokenFDCAContract?.address,
     chainId: chain?.id,

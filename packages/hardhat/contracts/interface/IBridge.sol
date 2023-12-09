@@ -2,6 +2,6 @@
 pragma solidity 0.8.23;
 
 interface IBridge {
-    function bridgeTokens(uint64, address, string memory) external payable;
+    function bridgeTokens(uint64, address, string memory, address) external payable;
 }
 

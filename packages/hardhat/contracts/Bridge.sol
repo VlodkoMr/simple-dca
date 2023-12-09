@@ -12,11 +12,13 @@ contract Bridge is CCIPReceiver {
     address private immutable iRouter;
     address private immutable flexDCAContract;
     bool public immutable isTestnet;
-    bytes32 public latestMessageId;
     string public chainSelector;
 
-    event MessageSent(bytes32 messageId);
-    event MessageReceived(bytes32 latestMessageId);
+    mapping(address => bytes32[]) public sentMessages;
+    mapping(address => bytes32[]) public receivedMessages;
+
+    event MessageSent(bytes32 indexed, address indexed);
+    event MessageReceived(bytes32 indexed, address indexed);
 
     modifier onlyFlexDCAContract() {
         if (msg.sender != flexDCAContract) {
@@ -69,7 +71,8 @@ contract Bridge is CCIPReceiver {
     function bridgeTokens(
         uint64 _destinationChainSelector,
         address _receiverContract,
-        string memory _data
+        string memory _data,
+        address _senderAddress
     )
     external payable
     onlyFlexDCAContract()
@@ -87,22 +90,24 @@ contract Bridge is CCIPReceiver {
             _message
         );
 
-        emit MessageSent(_messageId);
+        sentMessages[_senderAddress].push(_messageId);
+
+        emit MessageSent(_messageId, _senderAddress);
     }
 
     function _ccipReceive(
         Client.Any2EVMMessage memory _message
     ) internal override {
-        latestMessageId = _message.messageId;
         (uint32 _strategyId, uint256 _amount, address _owner) = abi.decode(_message.data, (uint32, uint256, address));
 
-        emit MessageReceived(latestMessageId);
-
+        receivedMessages[_owner].push(_message.messageId);
         IFlexDCA(flexDCAContract).addBridgedDeposit(
             _amount,
             _strategyId,
             _owner
         );
+
+        emit MessageReceived(_message.messageId, _owner);
     }
 
 }

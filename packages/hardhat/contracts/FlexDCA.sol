@@ -370,7 +370,7 @@ contract FlexDCA is AutomationCompatibleInterface, Ownable, Utils {
             msg.sender
         ));
 
-        bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data);
+        bridgeContract.bridgeTokens{value: msg.value}(_destinationChainSelector, _receiverContract, _data, msg.sender);
     }
 
     // token deposited from bridge
