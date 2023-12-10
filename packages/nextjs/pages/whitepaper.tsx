@@ -65,24 +65,27 @@ const Whitepaper: NextPage = () => {
           </p>
 
           <h4 className={"mt-10"}>Main Features</h4>
-          <ul className={"mt-3"}>
+          <ul className={"mt-3 list-disc"}>
             <li>
-              Reduces Market Timing Risks: DCA eliminates the need to predict market highs and lows. Investors often find it challenging to
+              <b>Reduces Market Timing Risks:</b> DCA eliminates the need to predict market highs and lows. Investors often find it
+              challenging to
               time the market accurately, and mistimed investments can result in significant losses. DCA avoids the stress of trying to
               enter the market at the perfect time.
             </li>
             <li>
-              Mitigates Emotional Decision-Making: By sticking to a consistent investment plan, DCA helps investors avoid making emotional
+              <b>Mitigates Emotional Decision-Making:</b> By sticking to a consistent investment plan, DCA helps investors avoid making
+              emotional
               decisions based on short-term market fluctuations. Emotions such as fear and greed can lead to impulsive actions, which may
               not be in the best interest of long-term investment goals.
             </li>
             <li>
-              Long-Term Focus: DCA is particularly suitable for long-term investors who are more concerned with the overall performance of
+              <b>Long-Term Focus:</b> DCA is particularly suitable for long-term investors who are more concerned with the overall
+              performance of
               their investments over an extended period rather than short-term market movements.
             </li>
             <li>
-              Automatic Investing: Many investors choose to set up automatic transfers from their bank accounts to their investment
-              accounts, making the DCA process automatic and convenient.
+              <b>Automatic Investing:</b> You can join investment strategy in FlexDCA, making the DCA process automatic and convenient.
+              Invest stablecoins, configure each strategy and claim your result crypto tokens based on DCA strategy.
             </li>
           </ul>
 
