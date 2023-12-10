@@ -14,8 +14,15 @@ contract Bridge is CCIPReceiver {
     bool public immutable isTestnet;
     string public chainSelector;
 
+    struct MessageData {
+        uint64 destinationChainSelector;
+        uint32 strategyId;
+        uint256 amount;
+    }
+
     mapping(address => bytes32[]) public sentMessages;
     mapping(address => bytes32[]) public receivedMessages;
+    mapping(bytes32 => MessageData) public messageData;
 
     event MessageSent(bytes32 indexed, address indexed);
     event MessageReceived(bytes32 indexed, address indexed);
@@ -90,7 +97,13 @@ contract Bridge is CCIPReceiver {
             _message
         );
 
+        (uint32 _strategyId, uint256 _amount,) = abi.decode(bytes(_data), (uint32, uint256, address));
         sentMessages[_senderAddress].push(_messageId);
+        messageData[_messageId] = MessageData({
+            destinationChainSelector: _destinationChainSelector,
+            strategyId: _strategyId,
+            amount: _amount
+        });
 
         emit MessageSent(_messageId, _senderAddress);
     }
@@ -108,6 +121,14 @@ contract Bridge is CCIPReceiver {
         );
 
         emit MessageReceived(_message.messageId, _owner);
+    }
+
+    function getMessagesHistory() public view returns (MessageData[] memory) {
+        MessageData[] memory _result = new MessageData[](sentMessages[msg.sender].length);
+        for (uint256 i = 0; i < sentMessages[msg.sender].length; i++) {
+            _result[i] = messageData[sentMessages[msg.sender][i]];
+        }
+        return _result;
     }
 
 }
