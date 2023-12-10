@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { BigNumber } from "@ethersproject/bignumber";
-import { erc20ABI, useAccount, useBalance, useContractRead, useToken, useWaitForTransaction } from "wagmi";
-import { formatUnits, parseUnits } from "viem";
-import { useScaffoldAddressWrite } from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
-import { repeatOptions } from "~~/config/constants";
 import { getNetwork } from "@wagmi/core";
+import { formatUnits, parseUnits } from "viem";
+import { erc20ABI, useAccount, useBalance, useContractRead, useToken, useWaitForTransaction } from "wagmi";
+import { repeatOptions } from "~~/config/constants";
+import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldAddressWrite } from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 
 type MetaHeaderProps = {
   strategy: Strategy;
@@ -16,14 +16,11 @@ const defaultRepeat = 168;
 const defaultSplitCount = 10;
 const splitOptions = [3, 5, 7, 10, 15, 20, 25, 30, 50, 100];
 
-export const JoinStrategy = ({
-                               strategy,
-                               onUpdate
-                             }: MetaHeaderProps) => {
+export const JoinStrategy = ({ strategy, onUpdate }: MetaHeaderProps) => {
   const account = useAccount();
   const { chain } = getNetwork();
   const [currentStep, setCurrentStep] = useState(1);
-  const [totalDeposit, setTotalDeposit] = useState("");
+  const [totalDeposit, setTotalDeposit] = useState<string | number>("");
   const [totalDepositWei, setTotalDepositWei] = useState(BigInt(0));
   const [splitCount, setSplitCount] = useState(defaultSplitCount);
   const [repeat, setRepeat] = useState(defaultRepeat);
@@ -62,9 +59,8 @@ export const JoinStrategy = ({
   useEffect(() => {
     const decimals = fromToken?.decimals || 0;
     const deposit = totalDeposit ? parseUnits(totalDeposit.toString(), decimals) : 0;
-    setTotalDepositWei(deposit);
+    setTotalDepositWei(BigInt(deposit));
   }, [totalDeposit]);
-
 
   useEffect(() => {
     if (strategy) {
@@ -80,18 +76,25 @@ export const JoinStrategy = ({
   const { write: joinStrategyWrite, data: joinData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "joinEditStrategy",
-    args: [strategy?.id, BigNumber.from(repeat).mul(60 * 60).toBigInt(), BigNumber.from(amountOnce).toBigInt()],
+    args: [
+      strategy?.id,
+      BigNumber.from(repeat)
+        .mul(60 * 60)
+        .toBigInt(),
+      BigNumber.from(amountOnce).toBigInt(),
+    ],
+    // @ts-ignore
     enabled: !!strategy && !!amountOnce && repeat > 0 && !!chain?.id,
-    onError: (error) => {
+    onError: error => {
       alert(error);
       setIsLoading(false);
       onUpdate();
     },
-    onSuccess: (tx) => {
+    onSuccess: tx => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
-    }
+    },
   });
 
   useWaitForTransaction({
@@ -104,18 +107,18 @@ export const JoinStrategy = ({
         setCurrentStep(3);
         depositWrite();
       }
-    }
+    },
   });
 
-
   const { write: writeApprove, data: approveData } = useScaffoldAddressWrite({
+    // @ts-ignore
     address: strategy?.fromAsset,
     functionName: "approve",
     abi: erc20ABI,
     chainId: chain?.id,
-    args: [flexDCAContract?.address, Number(totalDepositWei)],
+    args: [flexDCAContract?.address, BigInt(totalDepositWei)],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei,
-    onError: (error) => {
+    onError: error => {
       alert(error);
       setIsLoading(false);
     },
@@ -126,24 +129,25 @@ export const JoinStrategy = ({
     onSuccess: () => {
       setCurrentStep(3);
       depositWrite();
-    }
+    },
   });
 
-
+  // @ts-ignore
   const { write: depositWrite, data: depositData } = useScaffoldContractWrite({
     contractName: "FlexDCA",
     functionName: "deposit",
     args: [totalDepositWei, strategy?.id],
+    // @ts-ignore
     enabled: !!strategy && !!totalDepositWei,
-    onError: (error) => {
+    onError: error => {
       alert(error);
       setIsLoading(false);
     },
-    onSuccess: (tx) => {
+    onSuccess: tx => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
-    }
+    },
   });
 
   useWaitForTransaction({
@@ -151,17 +155,16 @@ export const JoinStrategy = ({
     onSuccess: () => {
       setIsLoading(false);
       onUpdate();
-      document.getElementById('join_strategy_modal')?.close();
-    }
+      // @ts-ignore
+      document.getElementById("join_strategy_modal")?.close();
+    },
   });
 
-
   const setMaxAmount = () => {
-    console.log(`fromTokenBalance`, fromTokenBalance);
     if (fromTokenBalance) {
       setTotalDeposit(parseFloat(fromTokenBalance.formatted));
     }
-  }
+  };
 
   const joinStrategy = async () => {
     if (!splitCount || !repeat || !totalDeposit) {
@@ -176,8 +179,10 @@ export const JoinStrategy = ({
 
     setIsLoading(true);
     joinStrategyWrite();
-  }
+  };
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <dialog id="join_strategy_modal" className="modal">
       {strategy && (
@@ -196,7 +201,7 @@ export const JoinStrategy = ({
                   min={1}
                   step={1}
                   value={totalDeposit}
-                  onChange={(e) => {
+                  onChange={e => {
                     setTotalDeposit(parseFloat(e.target.value));
                   }}
                   className="input input-bordered w-full font-normal max-w-xs focus:outline-none pr-16"
@@ -204,7 +209,8 @@ export const JoinStrategy = ({
                 />
                 <div
                   onClick={() => setMaxAmount()}
-                  className={"absolute z-10 right-4 top-3.5 text-sm text-blue-400 cursor-pointer hover:text-blue-500"}>
+                  className={"absolute z-10 right-4 top-3.5 text-sm text-blue-400 cursor-pointer hover:text-blue-500"}
+                >
                   MAX
                 </div>
               </div>
@@ -212,14 +218,19 @@ export const JoinStrategy = ({
               <div className={"flex flex-row gap-4 mb-3"}>
                 <div className={"w-32 pt-3 text-right"}>Repeat:</div>
                 <select
-                  onChange={(e) => {
+                  onChange={e => {
                     setRepeat(parseInt(e.target.value));
                   }}
                   value={repeat.toString()}
-                  className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
-                  <option disabled selected>Choose schedule period</option>
-                  {Object.keys(repeatOptions).map((option) => (
-                    <option key={option} value={option}>{repeatOptions[option]}</option>
+                  className="select select-bordered w-full font-normal max-w-xs focus:outline-none"
+                >
+                  <option disabled selected>
+                    Choose schedule period
+                  </option>
+                  {Object.keys(repeatOptions).map(option => (
+                    <option key={option} value={option}>
+                      {repeatOptions[option]}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -228,13 +239,18 @@ export const JoinStrategy = ({
                 <div className={"w-32 pt-3 text-right"}>Split to:</div>
                 <select
                   value={splitCount.toString()}
-                  onChange={(e) => {
+                  onChange={e => {
                     setSplitCount(parseInt(e.target.value));
                   }}
-                  className="select select-bordered w-full font-normal max-w-xs focus:outline-none">
-                  <option disabled selected>Choose transactions count</option>
-                  {splitOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
+                  className="select select-bordered w-full font-normal max-w-xs focus:outline-none"
+                >
+                  <option disabled selected>
+                    Choose transactions count
+                  </option>
+                  {splitOptions.map(option => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -242,11 +258,13 @@ export const JoinStrategy = ({
               <div className={"flex flex-row gap-4 mb-3"}>
                 <div className={"w-32 text-right"}>Amount once:</div>
                 <div>
-                  {totalDeposit > 0 && splitCount > 0 ? (
+                  {parseFloat(totalDeposit.toString()) > 0 && splitCount > 0 ? (
                     <>
-                      {formatUnits(amountOnce, fromToken?.decimals || 0)} {strategy.assetFromTitle}
+                      {formatUnits(BigInt(amountOnce), fromToken?.decimals || 0)} {strategy.assetFromTitle}
                     </>
-                  ) : ("-")}
+                  ) : (
+                    "-"
+                  )}
                 </div>
               </div>
 
@@ -255,14 +273,15 @@ export const JoinStrategy = ({
                 <button
                   onClick={() => joinStrategy()}
                   disabled={!splitCount || !repeat || !totalDeposit}
-                  className={"btn btn-sm bg-orange-200 border-orange-300 rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"}>
+                  className={
+                    "btn btn-sm bg-orange-200 border-orange-300 rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"
+                  }
+                >
                   Join Strategy
                 </button>
               </div>
             </div>
-
           ) : (
-
             <div className={"text-center"}>
               <div className={"my-6"}>
                 <span className="loading loading-spinner loading-lg opacity-50"></span>
@@ -274,9 +293,7 @@ export const JoinStrategy = ({
                 <li className={`step ${currentStep === 3 && "step-primary"}`}>Deposit {strategy.assetFromTitle}</li>
               </ul>
             </div>
-
           )}
-
         </div>
       )}
     </dialog>

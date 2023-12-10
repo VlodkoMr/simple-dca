@@ -8,6 +8,7 @@ import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaf
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite<Abi, string, undefined>>["writeAsync"]>[0];
 
+// @ts-ignore
 /**
  * @dev wrapper for wagmi's useContractWrite hook(with config prepared by usePrepareContractWrite hook) which loads in deployed contract abi and address automatically
  * @param config - The config settings, including extra wagmi configuration
@@ -17,19 +18,20 @@ type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite<Abi, string, un
  * @param config.args - arguments for the function
  * @param config.value - value in ETH that will be sent with transaction
  */
+
 export const useScaffoldAddressWrite = <
   TContractName extends ContractName,
-  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable"|"payable">,
+  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable" | "payable">,
 >({
-    address,
-    abi,
-    functionName,
-    args,
-    value,
-    onBlockConfirmation,
-    blockConfirmations,
-    ...writeConfig
-  }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
+  address,
+  abi,
+  functionName,
+  args,
+  value,
+  onBlockConfirmation,
+  blockConfirmations,
+  ...writeConfig
+}: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
   const { chain } = useNetwork();
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
@@ -46,13 +48,13 @@ export const useScaffoldAddressWrite = <
   });
 
   const sendContractWriteTx = async ({
-                                       args: newArgs,
-                                       value: newValue,
-                                       ...otherConfig
-                                     }: {
+    args: newArgs,
+    value: newValue,
+    ...otherConfig
+  }: {
     args?: UseScaffoldWriteConfig<TContractName, TFunctionName>["args"];
     value?: UseScaffoldWriteConfig<TContractName, TFunctionName>["value"];
-  }&UpdatedArgs = {}) => {
+  } & UpdatedArgs = {}) => {
     if (!chain?.id) {
       notification.error("Please connect your wallet");
       return;

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { BigNumber } from "@ethersproject/bignumber";
-import { erc20ABI, useAccount, useContractRead, useNetwork, useToken, useWaitForTransaction } from "wagmi";
 import { parseUnits } from "viem";
+import { erc20ABI, useAccount, useContractRead, useNetwork, useToken, useWaitForTransaction } from "wagmi";
+import { useDeployedContractInfo, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { useScaffoldAddressWrite } from "~~/hooks/scaffold-eth/useScaffoldAddressWrite";
 
 type MetaHeaderProps = {
@@ -10,10 +10,7 @@ type MetaHeaderProps = {
   onUpdate: () => void;
 };
 
-export const DepositStrategy = ({
-                                  strategy,
-                                  onUpdate
-                                }: MetaHeaderProps) => {
+export const DepositStrategy = ({ strategy, onUpdate }: MetaHeaderProps) => {
   const account = useAccount();
   const { chain } = useNetwork();
   const [currentStep, setCurrentStep] = useState(1);
@@ -43,9 +40,8 @@ export const DepositStrategy = ({
   useEffect(() => {
     const decimals = fromToken?.decimals || 0;
     const deposit = totalDeposit ? parseUnits(totalDeposit.toString(), decimals) : 0;
-    setTotalDepositWei(deposit);
+    setTotalDepositWei(BigInt(deposit));
   }, [totalDeposit]);
-
 
   useEffect(() => {
     if (strategy) {
@@ -60,19 +56,13 @@ export const DepositStrategy = ({
     address: strategy?.fromAsset,
     functionName: "approve",
     abi: erc20ABI,
-    args: [flexDCAContract?.address, Number(totalDepositWei)],
+    args: [flexDCAContract?.address, BigInt(totalDepositWei)],
     enabled: !!strategy?.fromAsset && !!flexDCAContract?.address && !!totalDepositWei && !!chain?.id,
-    // onBlockConfirmation: (txnReceipt) => {
-    //   console.log(`txnReceipt`, txnReceipt);
-    //   depositWrite();
-    //   setCurrentStep(2);
-    //   // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
-    // },
-    onError: (error) => {
+    onError: error => {
       alert(error);
       setIsLoading(false);
     },
-    onSuccess: (tx) => {
+    onSuccess: tx => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
@@ -84,7 +74,7 @@ export const DepositStrategy = ({
     onSuccess: () => {
       depositWrite();
       setCurrentStep(2);
-    }
+    },
   });
 
   const { write: depositWrite, data: depositData } = useScaffoldContractWrite({
@@ -92,7 +82,7 @@ export const DepositStrategy = ({
     functionName: "deposit",
     args: [totalDepositWei, strategy?.id],
     enabled: !!strategy && !!totalDepositWei,
-    onError: (error) => {
+    onError: error => {
       alert(error);
       setIsLoading(false);
     },
@@ -103,11 +93,11 @@ export const DepositStrategy = ({
     //   document.getElementById('deposit_strategy_modal')?.close();
     //   // toast(`Transaction blockHash ${txnReceipt.blockHash.slice(0, 10)}`);
     // },
-    onSuccess: (tx) => {
+    onSuccess: tx => {
       if (tx) {
         console.log("Transaction sent: " + tx.hash);
       }
-    }
+    },
   });
 
   useWaitForTransaction({
@@ -115,8 +105,8 @@ export const DepositStrategy = ({
     onSuccess: () => {
       setIsLoading(false);
       onUpdate();
-      document.getElementById('deposit_strategy_modal')?.close();
-    }
+      document.getElementById("deposit_strategy_modal")?.close();
+    },
   });
 
   const depositToStrategy = async () => {
@@ -132,7 +122,7 @@ export const DepositStrategy = ({
       setCurrentStep(2);
       depositWrite();
     }
-  }
+  };
 
   return (
     <dialog id="deposit_strategy_modal" className="modal">
@@ -151,7 +141,7 @@ export const DepositStrategy = ({
                   type="number"
                   min={1}
                   step={1}
-                  onChange={(e) => {
+                  onChange={e => {
                     setTotalDeposit(parseFloat(e.target.value));
                   }}
                   className="input input-bordered w-full font-normal max-w-xs focus:outline-none"
@@ -164,14 +154,15 @@ export const DepositStrategy = ({
                 <button
                   onClick={() => depositToStrategy()}
                   disabled={!totalDeposit}
-                  className={"btn btn-sm bg-orange-200 border-orange-300 rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"}>
+                  className={
+                    "btn btn-sm bg-orange-200 border-orange-300 rounded-full hover:bg-orange-300 hover:border-orange-400 outline-none"
+                  }
+                >
                   Deposit
                 </button>
               </div>
             </div>
-
           ) : (
-
             <div className={"text-center"}>
               <div className={"my-6"}>
                 <span className="loading loading-spinner loading-lg opacity-50"></span>
@@ -182,9 +173,7 @@ export const DepositStrategy = ({
                 <li className={`step ${currentStep === 2 && "step-primary"}`}>Deposit {strategy.assetFromTitle}</li>
               </ul>
             </div>
-
           )}
-
         </div>
       )}
     </dialog>
