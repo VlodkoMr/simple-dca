@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { MetaHeader } from "~~/components/MetaHeader";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 import React, { useEffect, useMemo, useState } from "react";
 import { useAccount, useNetwork } from "wagmi";
 import { JoinStrategy } from "~~/components/modals/JoinStrategy";
@@ -128,7 +128,6 @@ const Strategies: NextPage = () => {
           <div className={"w-1/5"}>My Position</div>
           <div className={"w-32 text-right"}>Action</div>
         </div>
-
 
         {tokenDecimals && Object.keys(tokenDecimals).length > 0 ? (
           <div className={"mb-24"}>

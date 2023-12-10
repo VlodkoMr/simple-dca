@@ -1,14 +1,12 @@
-import type {ExtractAbiFunctionNames} from "abitype";
-import {useContractRead} from "wagmi";
-import {useDeployedContractInfo} from "~~/hooks/scaffold-eth";
-import {getTargetNetwork} from "~~/utils/scaffold-eth";
+import type { ExtractAbiFunctionNames } from "abitype";
+import { useContractRead } from "wagmi";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import {
   AbiFunctionReturnType,
   ContractAbi,
   ContractName,
   UseScaffoldReadConfig,
 } from "~~/utils/scaffold-eth/contract";
-import {getNetwork} from "@wagmi/core";
 
 /**
  * @dev wrapper for wagmi's useContractRead hook which loads in deployed contract contract abi, address automatically
@@ -20,16 +18,15 @@ import {getNetwork} from "@wagmi/core";
  */
 export const useScaffoldContractRead = <
   TContractName extends ContractName,
-  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "pure" | "view">,
+  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "pure"|"view">,
 >({
-  contractName,
-  functionName,
-  args,
-  chainId,
-  ...readConfig
-}: UseScaffoldReadConfig<TContractName, TFunctionName>) => {
-  // const {chain} = getNetwork();
-  const {data: deployedContract} = useDeployedContractInfo(contractName, chainId);
+    contractName,
+    functionName,
+    args,
+    chainId,
+    ...readConfig
+  }: UseScaffoldReadConfig<TContractName, TFunctionName>) => {
+  const { data: deployedContract } = useDeployedContractInfo(contractName, chainId);
 
   return useContractRead({
     functionName,
@@ -40,8 +37,8 @@ export const useScaffoldContractRead = <
     chainId: chainId,
     enabled: !!chainId && (!Array.isArray(args) || !args.some(arg => arg === undefined)),
     ...(readConfig as any),
-  }) as Omit<ReturnType<typeof useContractRead>, "data" | "refetch"> & {
-    data: AbiFunctionReturnType<ContractAbi, TFunctionName> | undefined;
+  }) as Omit<ReturnType<typeof useContractRead>, "data"|"refetch">&{
+    data: AbiFunctionReturnType<ContractAbi, TFunctionName>|undefined;
     refetch: (options?: {
       throwOnError: boolean;
       cancelRefetch: boolean;
